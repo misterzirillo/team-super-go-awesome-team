@@ -15,6 +15,8 @@ class Data:
         if len(self.formattedInput) == 1:
             self.formattedInput = self.rawInput.split(",")
 
+        self.formatted.join(self.formatted, ",")
+
     def printData(dataName):
         # print to <dataName>-data.arff
         <dataName>-data.arff.write(self.formattedInput)
