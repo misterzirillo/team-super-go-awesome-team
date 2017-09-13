@@ -11,6 +11,8 @@ class Header:
     def formatHeader():
         # iterate over self.rawInput
         # self.formattedInput = self.rowInput.map(it => it.format()) ???
+        pass
 
     def printHeader(dataName):
         # print to <dataName>-header.arff
+        pass
