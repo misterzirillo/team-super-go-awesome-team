@@ -5,19 +5,19 @@ class Data:
     # python's constructor syntax
     def __init__(self, inputListOfStrings):
         # inputListOfStrings is the lines of the input file
-        self.rawInput = inputListOfStrings
-        self.formatData()
+        self.dataStrings = inputListOfStrings
 
     def formatData():
         # iterate over self.rawInput
         # self.formattedInput = self.rowInput.map(it => it.format()) ???
-        self.formattedInput = self.rawInput.split()
-        if len(self.formattedInput) == 1:
-            self.formattedInput = self.rawInput.split(",")
-
-        self.formatted.join(self.formatted, ",")
+        for s in self.rawInput
+            s = s.split()
+            if len(s) == 1:
+                s = s.split(",")
+            ",".join(s)
+        return self.dataStrings
 
     def printData(dataName):
         # print to <dataName>-data.arff
-        <dataName>-data.arff.write(self.formattedInput)
-
+        <dataName>-data.arff.write(self.dataStrings)
+        
