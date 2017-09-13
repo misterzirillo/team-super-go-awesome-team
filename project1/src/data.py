@@ -16,8 +16,9 @@ class Data:
                 s = s.split(",")
             ",".join(s)
         return self.dataStrings
+        pass
 
     def printData(dataName):
         # print to <dataName>-data.arff
         <dataName>-data.arff.write(self.dataStrings)
-        
+        pass
