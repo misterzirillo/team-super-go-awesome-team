@@ -11,6 +11,11 @@ class Data:
     def formatData():
         # iterate over self.rawInput
         # self.formattedInput = self.rowInput.map(it => it.format()) ???
+        self.formattedInput = self.rawInput.split()
+        if len(self.formattedInput) == 1:
+            self.formattedInput = self.rawInput.split(",")
 
-    def printHeader(dataName):
+    def printData(dataName):
         # print to <dataName>-data.arff
+        <dataName>-data.arff.write(self.formattedInput)
+
