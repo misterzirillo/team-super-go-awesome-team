@@ -18,7 +18,7 @@ fileLocationsAndAttributes = {
     #fertility
     '../data/fertility/fertility_Diagnosis.txt': {
         'relation': 'fertility',
-        'attributeNames': ['Season', 'Age 18-36', 'Childish disease', 'Access/trauma', 'Surgery', 'Fevers', 'Alcohol consumption', 'Smoker', 'Hours spent sitting'],
+        'attributeNames': ['Season', 'Age 18-36', 'Childish-disease', 'Access/trauma', 'Surgery', 'Fevers', 'Alcohol-consumption', 'Smoker', 'Hours-spent-sitting'],
         'classNames': ['N', 'O']
     },
 
