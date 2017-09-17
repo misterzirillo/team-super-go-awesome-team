@@ -1,6 +1,6 @@
 import re
 
-whiteSpace = re.compile('\s*')
+whiteSpace = re.compile(r'\s+')
 
 def processRows(inputListOfStrings, rowTransform):
     # take in list of strings:
