@@ -1,20 +1,20 @@
-# I've tried to include a general idea of how this might work
+import re
 
-class Data:
+whiteSpace = re.compile('\s*')
 
-    # python's constructor syntax
-    def __init__(self, inputListOfStrings):
-        # inputListOfStrings is the lines of the input file
-        self.dataStrings = inputListOfStrings
-        self.formatData()
+def processRows(inputListOfStrings, rowTransform):
+    # take in list of strings:
+    # if list is whitespace-separated...
 
-    def formatData(self):
-        # iterate over self.rawInput
-        # split each string in list
-        # join with comma's
-        if len(self.dataStrings[0].split()) == 1: #must be comma separated if split does nothing
-            for s in self.dataStrings:
-                s = ",".join(s.split(",")) #maybe should delete this... and just pass... but at least now our converter makes the computer do something
-        else: #must be space separated if not comma separated
-            for s in self.dataStrings:
-                s = ",".join(s.split())
+    unjoined = None
+    if len(inputListOfStrings[0].split(',')) == 1:
+        unjoined = map(lambda s: whiteSpace.split(s.strip()), inputListOfStrings)
+
+    # otherwise comma separated
+    else:
+        unjoined = map(lambda s: s.strip().split(','), inputListOfStrings)
+
+    if rowTransform is None:
+        return map(lambda row: ",".join(row) + '\n', unjoined)
+    else:
+        return map(lambda row: ",".join(rowTransform(row)) + '\n', unjoined)

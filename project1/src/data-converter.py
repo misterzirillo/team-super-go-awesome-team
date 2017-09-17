@@ -6,33 +6,38 @@ import os
 import inspect
 from arff import ARFF
 
+def drop1(llist):
+    return llist[1:]
+
 fileLocationsAndAttributes = {
 
     #ecoli
     '../data/ecoli/ecoli.data': {
         'relation': 'ecoli',
-        'attributeNames': ['Sequence name', 'mcg', 'gvh', 'lip', 'chg', 'aac', 'alm1', 'alm2'],
+        'attributeNames': ['mcg', 'gvh', 'lip', 'chg', 'aac', 'alm1', 'alm2'],
         'classNames': ['cp', 'im', 'pp', 'imU', 'om', 'omL', 'imL', 'imS'],
+        'rowFn': drop1
     },
 
     #fertility
     '../data/fertility/fertility_Diagnosis.txt': {
         'relation': 'fertility',
-        'attributeNames': ['Season', 'Age 18-36', 'Childish-disease', 'Access/trauma', 'Surgery', 'Fevers', 'Alcohol-consumption', 'Smoker', 'Hours-spent-sitting'],
+        'attributeNames': ['Season', 'Age-18-36', 'Childish-disease', 'Access/trauma', 'Surgery', 'Fevers', 'Alcohol-consumption', 'Smoker', 'Hours-spent-sitting'],
         'classNames': ['N', 'O']
     },
 
     #glass
     '../data/glass/glass.data': {
         'relation': 'glass',
-        'attributeNames': ['Id number', 'RI', 'Na', 'Mg', 'Al', 'Si', 'K', 'Ca', 'Ba', 'Fe'],
-        'classNames': map(str, range(1, 8)), #'1'...'7'
+        'attributeNames': ['RI', 'Na', 'Mg', 'Al', 'Si', 'K', 'Ca', 'Ba', 'Fe'],
+        'classNames': list(map(str, range(1, 8))), #'1'...'7'
+        'rowFn': drop1
     },
 
     #ionosphere
     '../data/ionosphere/ionosphere.data': {
         'relation': 'ionosphere',
-        'attributeNames': map(str, range(1, 35)), #1..34 + class attr
+        'attributeNames': list(map(str, range(1, 35))), #1..34 + class attr
         'classNames': ['g', 'b']
     },
 

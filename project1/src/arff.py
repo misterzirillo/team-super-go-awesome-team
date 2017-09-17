@@ -1,5 +1,4 @@
-from header import Header
-from data import Data
+from data import processRows
 from os import path, makedirs
 
 class ARFF:
@@ -8,10 +7,10 @@ class ARFF:
         self.fileLocation = fileLocation
         self.headerDetails = headerDetails
         self.outputLocation = path.join(outputDir, path.splitext(path.basename(fileLocation))[0] + '.arff')
-        #self.header = Header(attributeNames)
 
+        rowTransform = headerDetails['rowFn'] if 'rowFn' in headerDetails else None
         with open(fileLocation, 'r') as file:
-            self.data = Data(file.readlines())
+            self.dataLines = processRows(file.readlines(), rowTransform)
 
     def printARFF(self):
 
@@ -34,4 +33,4 @@ class ARFF:
 
             #write data
             file.write('@Data' + '\n')
-            file.writelines(self.data.dataStrings)
+            file.writelines(self.dataLines)
