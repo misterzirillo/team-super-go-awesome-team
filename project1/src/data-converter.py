@@ -6,9 +6,15 @@ import os
 import inspect
 from arff import ARFF
 
+# apply this to any functor to drop the first element (useful for some of our datasets)
 def drop1(llist):
     return llist[1:]
 
+'''
+This map defines the locations of our raw datasets with respect to this file.
+Associated with each dataset is the relation name, attribute names, class names,
+and (optionally) a row transform to apply to each row of data.
+'''
 fileLocationsAndAttributes = {
 
     #ecoli
@@ -16,7 +22,7 @@ fileLocationsAndAttributes = {
         'relation': 'ecoli',
         'attributeNames': ['mcg', 'gvh', 'lip', 'chg', 'aac', 'alm1', 'alm2'],
         'classNames': ['cp', 'im', 'pp', 'imU', 'om', 'omL', 'imL', 'imS'],
-        'rowFn': drop1
+        'rowFn': drop1 #the first column of this data is an ID an needs to be dropped
     },
 
     #fertility
@@ -31,7 +37,7 @@ fileLocationsAndAttributes = {
         'relation': 'glass',
         'attributeNames': ['RI', 'Na', 'Mg', 'Al', 'Si', 'K', 'Ca', 'Ba', 'Fe'],
         'classNames': list(map(str, range(1, 8))), #'1'...'7'
-        'rowFn': drop1
+        'rowFn': drop1 #the first column of this data is an ID an needs to be dropped
     },
 
     #ionosphere
@@ -50,6 +56,7 @@ fileLocationsAndAttributes = {
 }
 
 thisFileLocation = os.path.dirname(inspect.stack()[0][1])
+# takes a path relative to this location and converts it to an absolute one
 def fileRelativeToHere(relativePath):
     return os.path.abspath(os.path.join(thisFileLocation, relativePath))
 

@@ -14,6 +14,7 @@ class ARFF:
 
     def printARFF(self):
 
+        # create the path to the output destination if necessary
         if not path.exists(path.dirname(self.outputLocation)):
             try:
                 makedirs(path.dirname(self.outputLocation))
@@ -21,9 +22,10 @@ class ARFF:
                 if exc.errno != errno.EEXIST:
                     raise
 
+        # now actually write to the output file
         with open(self.outputLocation, 'w') as file:
 
-            #write header
+            #write header info
             file.write('@Relation ' + self.headerDetails['relation'] + '\n')
 
             for attr in self.headerDetails['attributeNames']:
