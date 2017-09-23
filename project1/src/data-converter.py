@@ -70,7 +70,7 @@ def main():
         print('** And classes', fileLocationsAndAttributes[k]['classNames'])
         arff = ARFF(absolutePath, outputDir, fileLocationsAndAttributes[k])
         arff.printARFF()
-        print('->', absolutePath, '\n')
+        print('->', arff.outputLocation, '\n')
 
 
 if __name__ == '__main__': main()
