@@ -1,38 +1,53 @@
 import argparse
+import numpy
+from functools import reduce
 
 # implementation of rosenbrock
-def rosenbrock(*args):
+def rosenbrock(*vals):
+
+    if len(vals) < 2: raise ValueError('2 or more values required')
+
     def iteration(i):
-        xCurrent = args[i]
-        xNext = args[i + 1]
+        xCurrent = vals[i]
+        xNext = vals[i + 1]
         return 100 * (xNext - xCurrent**2)**2 + (1 - xCurrent)**2
 
-    return sum([iteration(i) for i in range(len(args) - 1)])
+    return sum([iteration(i) for i in range(len(vals) - 1)])
+
+# this function will build a dataset with the given parameters
+# dimension: number of dimensions to use > 1
+# size: how many values in the dataset
+# returns a dictionary where the key is the argument tuple and the value is the computed rosenbrock
+# argument values are restricted -10..10. not sure if this is proper but we need some boundaries
+def buildDataset(dimension, size):
+    ret = dict()
+    for i in range(size):
+        rosenArgs = tuple(numpy.random.uniform(-10., 10., dimension))
+        rosenVal = rosenbrock(*rosenArgs)
+        ret[rosenArgs] = rosenVal
+    return ret
 
 # this fn is the meat and potatos of the driver
-# it validates input and orchestrates the creation and training
-# of either an mlp or rbf network
-def makeNetwork(networkType, dimension, layerConfig):
+# it validates input and orchestrates the creation and training FOR ROSENBROCK
+# networkType: either mlp or rbf
+# dimension: the rosenbrock dimension
+def constructNetwork(networkType, dimension, layerConfig=[]):
     
     # validate input
     if (networkType != 'mlp' and networkType != 'rbf'):
-        print('Invalid network type: ' + networkType)
-        return
+        raise ValueError('networkType must be \'mlp\' or \'rbf\'')
 
-    if (dimension < 1):
-        print('Invalid dimension < 1: ' + dimension)
-        return
+    if (dimension is not int or dimension < 1):
+        raise ValueError('dimension must be int > 1')
 
     # create & train
     if (networkType == 'mlp'):
 
         #mlp must have layerconfig
         if (len(layerConfig) < 1): 
-            print('MLP network must supply layerConfig')
-            return
+            raise ValueError('MLP must supply layerConfig')
         elif (not all(isinstance(e, int) and e > 0 for e in layerConfig)):
-            print('Invalid layerConfig; must provide integers > 0: ' + str(layerConfig))
-            return
+            raise ValueError('MLP layerConfig values must be int > 0')
 
         #create mlp
         #train mlp
