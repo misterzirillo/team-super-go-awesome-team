@@ -15,11 +15,11 @@ def rosenbrock(*vals):
     return sum([iteration(i) for i in range(len(vals) - 1)])
 
 # this function will build a dataset with the given parameters
-# dimension: number of dimensions to use > 1
-# size: how many values in the dataset
+# argumentDimension: number of dimensions to use for argument vector > 1
+# datasetSize: how many values in the dataset
 # returns a dictionary where the key is the argument tuple and the value is the computed rosenbrock
 # argument values are restricted -10..10. not sure if this is proper but we need some boundaries
-def buildDataset(dimension, size):
+def buildDataset(argumentDimension, datasetSize):
     ret = dict()
     for i in range(size):
         rosenArgs = tuple(numpy.random.uniform(-10., 10., dimension))
