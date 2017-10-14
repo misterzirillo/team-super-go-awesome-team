@@ -14,18 +14,27 @@ def rosenbrock(*vals):
 
     return sum([iteration(i) for i in range(len(vals) - 1)])
 
-# this function will build a dataset with the given parameters
+
+# takes a set of argument vectors and maps them to a set of tuples
+# each argument vector is paired with the rosenbrock output for that vector
+def buildDataset(arguments):
+    return list(map(lambda x: (x, rosenbrock(*x)), arguments))
+
+
+# this function will generate a set of arguments with the given parameters
 # argumentDimension: number of dimensions to use for argument vector > 1
 # datasetSize: how many values in the dataset
-# returns a dictionary where the key is the argument tuple and the value is the computed rosenbrock
-# argument values are restricted -10..10. not sure if this is proper but we need some boundaries
-def buildDataset(argumentDimension, datasetSize):
-    ret = dict()
-    for i in range(size):
-        rosenArgs = tuple(numpy.random.uniform(-10., 10., dimension))
-        rosenVal = rosenbrock(*rosenArgs)
-        ret[rosenArgs] = rosenVal
-    return ret
+def generateRandomArguments(argumentDimension, datasetSize):
+    if argumentDimension > 1:
+        return [numpy.random.uniform(-3., 3., argumentDimension) for i in range(datasetSize)]
+    else:
+        raise ValueError('argumentDimension < 2')
+
+def generateAndWriteDataset(argumentDimension, datasetSize, filename):
+    with open(filename, 'w') as f:
+        lines = map(lambda tup: ','.join(map(str, numpy.append(tup[0], tup[1]))) + '\n', buildDataset(generateRandomArguments(argumentDimension, datasetSize)))
+        f.writelines(lines)
+
 
 # this fn is the meat and potatos of the driver
 # it validates input and orchestrates the creation and training FOR ROSENBROCK
@@ -63,13 +72,11 @@ def constructNetwork(networkType, dimension, layerConfig=[]):
 
 
 # when executing as script...
-
-# make parser
-parser = argparse.ArgumentParser()
-parser.add_argument('networkType', choices=['mlp', 'rbf'], help='The type of network')
-parser.add_argument('dimension', type=int, help='The number of dimensions to use')
-parser.add_argument('layerConfig', nargs='*', type=int, help='The number of nodes in each hidden layer. Each value represents a layer.')
-
 if __name__ == '__main__':
+    # make parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument('networkType', choices=['mlp', 'rbf'], help='The type of network')
+    parser.add_argument('dimension', type=int, help='The number of dimensions to use')
+    parser.add_argument('layerConfig', nargs='*', type=int, help='The number of nodes in each hidden layer. Each value represents a layer.')
     args = parser.parse_args()
     makeNetwork(args.networkType, args.dimension, args.layerConfig)
