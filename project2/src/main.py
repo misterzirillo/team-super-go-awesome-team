@@ -1,6 +1,8 @@
 import argparse
 import numpy
 from functools import reduce
+import os
+import inspect
 
 # implementation of rosenbrock
 def rosenbrock(*vals):
@@ -30,10 +32,31 @@ def generateRandomArguments(argumentDimension, datasetSize):
     else:
         raise ValueError('argumentDimension < 2')
 
+
+# generates a dataset with the given parameters and writes it in the current directory
 def generateAndWriteDataset(argumentDimension, datasetSize, filename):
     with open(filename, 'w') as f:
-        lines = map(lambda tup: ','.join(map(str, numpy.append(tup[0], tup[1]))) + '\n', buildDataset(generateRandomArguments(argumentDimension, datasetSize)))
+        dataset = buildDataset(generateRandomArguments(argumentDimension, datasetSize))
+        lines = map(lambda tup: ','.join(map(str, numpy.append(tup[0], tup[1]))) + '\n', dataset)
         f.writelines(lines)
+
+
+# helper to write files with relative locations
+thisFileLocation = os.path.dirname(inspect.stack()[0][1])
+def fileRelativeToHere(relativePath):
+    return os.path.abspath(os.path.join(thisFileLocation, relativePath))
+
+
+# parse in a dataset from the data folder by name
+def readDatasetFromFile(filename):
+    data = []
+    with open('../data/' + filename, 'r') as f:
+        for line in f:
+            linearr = list(map(float, line.split(',')))
+            arg = numpy.asarray(linearr[:len(linearr) - 2])
+            out = linearr[len(linearr) - 1]
+            data.append( (arg, out) )
+    return data
 
 
 # this fn is the meat and potatos of the driver
