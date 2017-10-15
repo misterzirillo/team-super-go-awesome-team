@@ -1,36 +1,33 @@
 import math
-import numpy
+import numpy as np
 import functools
-from itertools import permutations, combinations, product
+import argparse
+from itertools import product
+from datetime import datetime
+from main import readDatasetFromFile
 
 class RBF:
 
 	#set the number of inputs, the number of hidden nodes, and the number of outputs
-	def __init__(self, k, outputs, trainingData):
+	def __init__(self, k, trainingData, eta):
 
-		self.trainingData = numpy.asarray(trainingData)
+		self.trainingData = np.asarray(trainingData)
 
 		# the argument dimension > 1
-		self.n = len(trainingData[0])
-
-		#the output layer, will be 1 node for our purposes
-		self.outputs = outputs
+		self.n = len(trainingData[0][0])
 
 		#set some tunable parameters that may or may not get adjusted
-		self.eta = .5
+		self.eta = eta
 
-		self.centers = list(map(numpy.asarray, centers(k, self.n)))
+		self.centers = list(map(np.asarray, centers(k, self.n)))
 		self.k = len(self.centers)
-		print(k)
 
 		# determine max distance each center to all other centers
-		maxCenterDistance = distance(numpy.array([-3] * self.n), numpy.array([3] * self.n))
-		self.sigma = maxCenterDistance / (2 * self.k)
+		maxCenterDistance = distance(np.array([-3] * self.n), np.array([3] * self.n))
+		self.sigma = maxCenterDistance / math.sqrt(2 * self.k)
 
 		# get some weights boy
-		self.weights = numpy.random.sample(k)
-
-		print(len(self.weights))
+		self.weights = np.ones(self.k)
 		
 
     #one pass of gradient descent on the weights from the hidden layer to the output
@@ -39,107 +36,64 @@ class RBF:
 		#Weights = Weights + eta(actual value at input - ouput of the network at input)* input vector
 		#run until it converges to the least squared error which is E = (actual value - output of network)^2 
 
-		targetError = .2
-		trainingBatches = numpy.split(self.trainingData, 5)
+		batchSize = 2 ** (self.n + 2)
 
-		trainingIndex = 0
-		iterations = 0
-		allBatchError = []
-		allForwardPropError = []
+		timelimitMinutes = 30
+		batchMSEs =[]
+		epoch = 0
+		notConverged = True
+		epochLimit = 1000
+		weightChangeLimiter = 0
 
-		m = len(self.trainingData)
+		start = datetime.now()
+		def checkTimeMinutes():
+			return (datetime.now() - start).total_seconds() // 60
+		
+		try:
+			while notConverged and epoch < epochLimit and checkTimeMinutes() < timelimitMinutes:
 
-		with open('error_rates.csv', 'w') as f:
-			while iterations < 100:
-				epockavg = []
-				for data in self.trainingData:
-					#print('_________ITERATION________')
-					#print(data)
-					inputVector = data[0]
-					#print(inputVector)
-					expectedOutput = data[1]
-					#print(expectedOutput)
-					networkOutput = self.propagate(inputVector)
-					#print(networkOutput)
+				batches = get_mini_batches(self.trainingData, batchSize)
 
-					xTrans = networkOutput[1].transpose()
+				for i, batch in enumerate(batches):
+					inputs, actuals = zip(*batch)
+					X = np.asarray(list(map(self.propagateToHiddenLayer, inputs)))
+					weightedSums = X.dot(self.weights) # activation function of output node
+					m = len(batch)
+					gradient, error = doGDForBatch(X, weightedSums, actuals, m)
 
-					hlo = networkOutput[1]
-
-					hloT = hlo.transpose()
-					hypothesis = networkOutput[0]
-					loss = hypothesis - expectedOutput
-					# avg cost per example (the 2 in 2*m doesn't really matter here.
-					# But to be consistent with the gradient, I include it)
-					cost = numpy.sum(loss ** 2) / (2 * m)
-					#print("Iteration %d | Cost: %f" % (i, cost))
-					# avg gradient per example
-					gradient = numpy.dot(xTrans, loss) / m
-
-					#weightUpdate = self.eta * error * networkOutput[1]
-					oldWeight = self.weights
+					# update weights
 					self.weights = self.weights - self.eta * gradient
 
-					#print(oldWeight)
-					#print(weightUpdate)
-					#print(self.weights)
-					#print()
+					# some accounting
+					batchError = np.mean([e ** 2 for e in error])
+					print('epoch\t{}\tbatch\t{}\tmins_elapsed\t{}\terror_mse\t{}'
+							.format(epoch, i, checkTimeMinutes(), batchError))
 
-					#if math.isnan(error): return
-					#print(error)
-					epockavg.append(loss)
-					#batchError.append(error)
+					if i == len(batches) - 1:
+						batchMSEs.append(batchError)
 
-				recordMe = numpy.mean(epockavg)
-				allForwardPropError.append(recordMe)
-				print('epc ' + str(iterations) + ':' + str(recordMe))
-				iterations += 1
+				epoch += 1
+				
+		except KeyboardInterrupt:
+			pass
 		
-		return allForwardPropError
-
-		# STOP TRAINING RIGHT WHEN CONVERGE??
-
-		# for epoch in trainingBatches:
-		# 	iterations = iterations + 1
-		# 	notConverged = True
-
-		# 	while iterations < 20:
-		# 		batchError = []
-		# 		batchWeights = []
-
-				# iterate over data in batch and collect error for each example
+		return batchMSEs
 				
 
-					#itrWeights = self.weights + (self.eta * error * networkOutput[1])
+	def propagateToHiddenLayer(self, input):
+		#pass all the inputs to the k hidden nodes
+		# and computer gaussian for each node
+		hiddenLayerOutput = np.fromiter(map(lambda c: guassian(input, c, self.sigma), self.centers), np.float)
+		return hiddenLayerOutput
 
 
-
-					#print(itrWeights)
-				# 	batchWeights.append(itrWeights)
-				# 	print(error)
-
-				# print('________EPOCH END__________')
-				# #print(batchWeights)
-				# newWeights = numpy.mean(numpy.asarray(batchWeights), axis=0)
-				# #print(newWeights)
-				# #oldWeights = self.weights
-				# #self.weights = self.weights - newWeights
-				# #print(self.weights)
-				# meanError = numpy.mean(batchError)
-				# allBatchError.append(meanError)
-				# iterations += 1
-				
-
-	def propagate(self, input):
-
-		#pass all the inputs to the k hidden nodes		
-		hiddenLayerOutput = numpy.asarray(list(map(lambda c: guassian(input, c, self.sigma), self.centers)))
-		thing = hiddenLayerOutput * self.weights
-		result = sum(thing)
-		return (result, hiddenLayerOutput)
+def doGDForBatch(x, h, y, m):
+	error = h - y
+	gradient = x.T.dot(error) / m
+	return (gradient, error)
 
 def distance(x, y):
-	return numpy.linalg.norm(x - y)
+	return np.linalg.norm(x - y)
 
 #the activation function of the hidden nodes
 def guassian(input, center, sigma):
@@ -149,6 +103,12 @@ def guassian(input, center, sigma):
 
 	return math.exp(-1 * ((dist**2) / (2 * sigma**2)))
 
+# given a dataset return minibatches 
+def get_mini_batches(dataset, batch_size):
+	random_idxs = np.random.choice(len(dataset), len(dataset), replace=True)
+	X_shuffled = list(map(lambda i: dataset[i], random_idxs))
+	mini_batches = [X_shuffled[i:i+batch_size] for i in range(0, len(dataset), batch_size)]
+	return mini_batches
 
 def centers(k, argDimension):
 
@@ -166,23 +126,35 @@ def centers(k, argDimension):
 		it = it + 1
 	gridStep.append(3.0)
 
-
-	#print(gridStep)
-	#print(len(gridStep))
 	perms = list(product(gridStep, repeat=argDimension))
-	#print(len(perms))
-	#print(perms)
-
+	
 	return perms
 
 if __name__ == '__main__':
-	#the constructor builds the network according to the arguments
-	#k means is called to determine the number of hidden nodes and sigma
-	#the constructor randomizes the centers and initial weights.
-	#enter a loop until the training method converges
-	#propagate to produce the output
-	#the end
+	# make parser
+	parser = argparse.ArgumentParser()
+	parser.add_argument('dataset', help='The name of the dataset in ../data to use')
+	parser.add_argument('numCentersK', type=int, help='The target number of centers')
+	args = parser.parse_args()
 
-	#Notes:
-	#we want to use stochastic updating
-	pass
+	data = readDatasetFromFile(args.dataset)
+	k = args.numCentersK
+	eta = .1
+
+	network = RBF(k, data, eta)
+	error = network.train()
+
+	netName = 'rbf-n{}-k{}'.format(network.n, network.k)
+	print('finished training network ' + netName)
+
+	errorFile = netName + '-error.csv'
+	print('printing MSE epoch values to ' + errorFile)	
+	with open(errorFile, 'w') as f:
+		f.writelines('\n'.join(map(str, error)))
+	
+	summaryFile = netName + '-summary.txt'
+	print('printing network summary to ' + summaryFile)
+	with open(summaryFile, 'w') as f:
+		f.write('n=' + str(network.n) + '\n')
+		f.write('centers=' + str(network.centers) + '\n')
+		f.write('weights=' + np.array2string(network.weights) + '\n')
