@@ -1,143 +1,110 @@
-import random
+import numpy as np
 
 
 class MLPNetwork(object):
-    layers = []
-    learning_rate = 0.1
-    momentum = 0.9      # Set as constant for now
 
-    # Creates the Feedforward Network
-    def __init__(self, n_inputs, n_outputs, nodes_per_layer=[]):
-        self.layers.append(Layer(n_inputs, 0, self))
-        for i in range(len(nodes_per_layer)):
-            self.layers.append(Layer(nodes_per_layer[i], i+1, self))
-        self.layers.append(Layer(n_outputs, len(nodes_per_layer)+1, self))
-
-    def feed_forward(self, data_in=[]):
-        for layer in range(len(self.layers)):
-            if layer == 0:
-                self.layers[layer].activate_base_layer(data_in)
-                pass
-            else:
-                self.layers[layer].activate_layer()
-
-
-class Layer(object):
-    nodes = []
-    layer_number = 0
-    n_nodes = 0
-    parent = []
-
-    def __init__(self, n_nodes, layer_number, in_parent):
-        self.n_nodes = n_nodes
-        self.layer_number = layer_number
-        self.parent = in_parent
-        self.nodes = []
-        if layer_number == 0:
-            for i in range(n_nodes):
-                self.nodes.append(Node(1, self))
-            pass
-        else:
-            for i in range(n_nodes):
-                self.nodes.append(Node(in_parent.layers[layer_number-1].n_nodes, self))
-            pass
-
-    def activate_layer(self):
-        for i in range(self.n_nodes):
-            self.nodes[i].activate_node()
-
-    def activate_base_layer(self, data_in=[]):
-        for i in range(len(data_in)):
-            self.nodes[i].activate_base_node(data_in[i])
-
-
-class Node(object):
-
+    layers = 0
+    shape = None
     weights = []
-    prev_change = []
-    sum = 0
-    transfer = 0
-    parent = []
-
-    def __init__(self, n_inputs, in_parent):
-        self.n_inputs = n_inputs
-        self.weights = [random.random() for i in range(self.n_inputs + 1)]
-        self.parent = in_parent
-
-    def update_weights(self, connection, weight):
-        self.weights[connection] = weight
-
-    # Just passes sum at this point, need to change
-    def transfer_function(self, in_sum):
-        return in_sum
-
-    # Activates the node and updates self.transfer
-    def activate_node(self):
-        t_sum = 0
-        for j in range(len(self.weights) - 1):
-            t_sum += self.weights[j] * self.parent.parent.layers[self.parent.layer_number - 1].nodes[j].transfer
-        t_sum += self.weights[len(self.weights) - 1]
-        self.transfer =  self.transfer_function(t_sum)
-
-    # Base Layer passes input data through
-    def activate_base_node(self, input_data):
-        self.transfer = input_data
 
 
-def rosenbrock(*vals):
+    def __init__(self, inputs, outputs, transfer, learning_rate, momentum, hidden=[]):
 
-    if len(vals) < 2: raise ValueError('2 or more values required')
+        # Network Basic Properties
+        self.learning_rate = learning_rate
+        self.momentum = momentum
+        self.function = transfer
+        self.c = 1.0
 
-    def iteration(i):
-        xCurrent = vals[i]
-        xNext = vals[i + 1]
-        return 100 * (xNext - xCurrent**2)**2 + (1 - xCurrent)**2
+        # Layer Properties
+        self.shape = [inputs]
+        for i in range(len(hidden)):
+            self.shape.append(hidden[i])
+        self.shape.append(outputs)
+        self.layers = len(self.shape) - 1
 
-    return sum([iteration(i) for i in range(len(vals) - 1)])
+        # Data from Feed Forward
+        self.layer_in = []
+        self.layer_out = []
+        self.previous_delta = []
 
+        # Weight Arrays
+        for (i, j) in zip(self.shape[:-1], self.shape[1:]):
+            self.weights.append(np.random.normal(scale=0.1, size=(j, i + 1)))
+            self.previous_delta.append(np.zeros((j, i + 1)))
 
-def buildDataset(argumentDimension, datasetSize):
-    ret = dict()
-    for i in range(datasetSize):
-        rosenArgs = tuple(random.uniform(-10., 10., argumentDimension))
-        rosenVal = rosenbrock(*rosenArgs)
-        ret[rosenArgs] = rosenVal
-    return ret
+    # Runs data through network
+    def feed_forward(self, train_data):
+        inputs = self.shape[0]
 
+        # Clear past data
+        self.layer_in = []
+        self.layer_out = []
 
-def constructNetwork(networkType, dimension, layerConfig=[]):
-    # validate input
-    if (networkType != 'mlp' and networkType != 'rbf'):
-        raise ValueError('networkType must be \'mlp\' or \'rbf\'')
+        # Start Feed Forward
+        for i in range(self.layers):
+            # Base Layer Inputs
+            if i == 0:
+                layer_in = self.weights[0].dot(np.vstack([train_data.T, np.ones([1, inputs])]))
+            # Higher Layers
+            else:
+                layer_in = self.weights[i].dot(np.vstack([self.layer_out[-1], np.ones([1, inputs])]))
 
-    if (dimension < 1):
-        raise ValueError('dimension must be int > 1')
+            self.layer_in.append(layer_in)
+            self.layer_out.append(self.transfer(layer_in))
 
-    #data = buildDataset(dimension, 100)
-    data = [3,2]
+        return self.layer_out[-1].T
 
-    # create & train
-    if (networkType == 'mlp'):
+    def train(self, x, y):
 
-        # mlp must have layerconfig
-        if (len(layerConfig) < 1):
-            raise ValueError('MLP must supply layerConfig')
-        elif (not all(isinstance(e, int) and e > 0 for e in layerConfig)):
-            raise ValueError('MLP layerConfig values must be int > 0')
+        delta = []
+        inputs = x.shape[0]
 
-        TestNetwork = MLPNetwork(dimension, 1, layerConfig)
-        TestNetwork.feed_forward(data)
+        self.feed_forward(x)
 
+        for i in reversed(range(self.layers)):
+            if i == self.layers - 1:
+                out_delta = self.layer_out[i] - y.T
+                error = np.sum(out_delta**2)
+                delta.append(out_delta * self.d_transfer(self.layer_in[i]))
+            else:
+                int_delta = self.weights[i + 1].T.dot(delta[-1])
+                delta.append(int_delta[:-1, :] * self.d_transfer(self.layer_in[i]))
 
-        # create mlp
-        # train mlp
-        # return mlp
-        pass
-    else:
-        # create rbf
-        # train rbf
-        # return rbf
-        pass
+        for i in range(self.layers):
+            delta_i = self.layers - 1 - i
 
+            if i == 0:
+                layer_out = np.vstack([x.T, np.ones([1, inputs])])
+            else:
+                layer_out = np.vstack([self.layer_out[i - 1], np.ones([1, self.layer_out[i - 1].shape[1]])])
 
-constructNetwork('mlp', 2, [3, 2])
+            cur_weight_delta = np.sum(\
+                                  layer_out[None,:,:].transpose(2, 0, 1) *\
+                                  delta[delta_i][None, :, :].transpose(2, 1, 0), axis = 0)
+
+            weight_delta = self.learning_rate * cur_weight_delta + self.momentum * self.previous_delta[i]
+
+            self.weights[i] -= weight_delta
+
+            self.previous_delta[i] = weight_delta
+
+        return error
+
+    def transfer(self, x):
+        if self.function == 'sig':
+            return 1 / (1+np.exp(-x))
+        elif self.function == 'lin':
+            return self.c * x
+
+    def d_transfer(self, x):
+        if self.function == 'sig':
+            temp = self.transfer(x)
+            return temp * (1 - temp)
+        elif self.function == 'lin':
+            return self.c
+
+if __name__ == "__main__":
+    MLP = MLPNetwork(2, 1, 'sig', 0.1, 0.9, [3, 2])
+    print(MLP.shape)
+    print(MLP.weights)
