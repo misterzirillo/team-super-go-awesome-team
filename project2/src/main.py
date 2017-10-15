@@ -53,7 +53,7 @@ def readDatasetFromFile(filename):
     with open('../data/' + filename, 'r') as f:
         for line in f:
             linearr = list(map(float, line.split(',')))
-            arg = numpy.asarray(linearr[:len(linearr) - 2])
+            arg = numpy.asarray(linearr[:len(linearr) - 1])
             out = linearr[len(linearr) - 1]
             data.append( (arg, out) )
     return data
