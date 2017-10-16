@@ -48,7 +48,7 @@ class RBF:
 		epochLimit = 1000
 		weightChangeLimiter = 0
 
-		printcounter = 0
+		printcount = 0
 
 		start = datetime.now()
 		def checkTimeMinutes():
@@ -71,7 +71,7 @@ class RBF:
 
 					# some accounting
 					printcount += m
-					if m > 1000:
+					if printcount > 1000:
 						batchError = np.mean([e ** 2 for e in error])
 						print('epoch\t{}\tbatch\t{}\tmins_elapsed\t{}\terror_mse\t{}'
 								.format(epoch, i, checkTimeMinutes(), batchError))
