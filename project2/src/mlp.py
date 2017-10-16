@@ -65,7 +65,7 @@ class MLPNetwork(object):
         batchSize = 2 ** (self.shape[0] + 2)
         batches = get_mini_batches(dataset, batchSize)
 
-        timelimitMinutes = 1
+        timelimitMinutes = 30
         batchMSEs =[]
         epoch = 0
         notConverged = True
