@@ -1,5 +1,9 @@
 import numpy as np
-
+from rbf import get_mini_batches
+from datetime import datetime
+import math
+import argparse
+from main import readDatasetFromFile
 
 class MLPNetwork(object):
 
@@ -8,11 +12,11 @@ class MLPNetwork(object):
     weights = []
 
 
-    def __init__(self, inputs, outputs, transfer, learning_rate, momentum, hidden=[]):
+    def __init__(self, inputs, outputs, transfer, hidden=[]):
 
         # Network Basic Properties
-        self.learning_rate = learning_rate
-        self.momentum = momentum
+        self.learning_rate = .1
+        self.momentum = .5
         self.function = transfer
         self.c = 1.0
 
@@ -35,7 +39,8 @@ class MLPNetwork(object):
 
     # Runs data through network
     def feed_forward(self, train_data):
-        inputs = self.shape[0]
+
+        inputs = train_data.shape[0]
 
         # Clear past data
         self.layer_in = []
@@ -55,56 +60,114 @@ class MLPNetwork(object):
 
         return self.layer_out[-1].T
 
-    def train(self, x, y):
+    def train(self, dataset):
 
-        delta = []
-        inputs = x.shape[0]
+        batchSize = 2 ** (self.shape[0] + 2)
+        batches = get_mini_batches(dataset, batchSize)
 
-        self.feed_forward(x)
+        timelimitMinutes = 1
+        batchMSEs =[]
+        epoch = 0
+        notConverged = True
 
-        for i in reversed(range(self.layers)):
-            if i == self.layers - 1:
-                out_delta = self.layer_out[i] - y.T
-                error = np.sum(out_delta**2)
-                delta.append(out_delta * self.d_transfer(self.layer_in[i]))
-            else:
-                int_delta = self.weights[i + 1].T.dot(delta[-1])
-                delta.append(int_delta[:-1, :] * self.d_transfer(self.layer_in[i]))
+        printcount = 0
 
-        for i in range(self.layers):
-            delta_i = self.layers - 1 - i
+        start = datetime.now()
+        def checkTimeMinutes():
+            return (datetime.now() - start).total_seconds() // 60
 
-            if i == 0:
-                layer_out = np.vstack([x.T, np.ones([1, inputs])])
-            else:
-                layer_out = np.vstack([self.layer_out[i - 1], np.ones([1, self.layer_out[i - 1].shape[1]])])
+        while notConverged and checkTimeMinutes() < timelimitMinutes:
 
-            cur_weight_delta = np.sum(\
-                                  layer_out[None,:,:].transpose(2, 0, 1) *\
-                                  delta[delta_i][None, :, :].transpose(2, 1, 0), axis = 0)
+            #return batches
+            for batchnum, batch in enumerate(batches):
+                delta = []
+                X, Y = zip(*batch)
+                x = np.asarray(X, dtype='int64')
+                y = np.asarray(Y)
 
-            weight_delta = self.learning_rate * cur_weight_delta + self.momentum * self.previous_delta[i]
+                inputs = x.shape[0]
 
-            self.weights[i] -= weight_delta
+                self.feed_forward(x)
 
-            self.previous_delta[i] = weight_delta
+                for i in reversed(range(self.layers)):
+                    if i == self.layers - 1:
+                        out_delta = self.layer_out[i] - y.T
+                        error = np.mean(out_delta**2)
+                        delta.append(out_delta * self.d_transfer(self.layer_in[i]))
+                    else:
+                        int_delta = self.weights[i + 1].T.dot(delta[-1])
+                        delta.append(int_delta[:-1, :] * self.d_transfer(self.layer_in[i]))
 
-        return error
+                for i in range(self.layers):
+                    delta_i = self.layers - 1 - i
+
+                    if i == 0:
+                        layer_out = np.vstack([x.T, np.ones([1, inputs])])
+                    else:
+                        layer_out = np.vstack([self.layer_out[i - 1], np.ones([1, self.layer_out[i - 1].shape[1]])])
+
+                    cur_weight_delta = np.sum(\
+                                        layer_out[None,:,:].transpose(2, 0, 1) *\
+                                        delta[delta_i][None, :, :].transpose(2, 1, 0), axis = 0)
+
+                    weight_delta = self.learning_rate * cur_weight_delta + self.momentum * self.previous_delta[i]
+
+                    self.weights[i] -= weight_delta
+
+                    self.previous_delta[i] = weight_delta
+
+                printcount += inputs
+                if printcount > 1000:
+                    batchMSEs.append(error)
+                    print('epoch\t{}\tbatch\t{}\tmins_elapsed\t{}\terror_mse\t{}'
+                                .format(epoch, batchnum, checkTimeMinutes(), error))
+                    printcount = 0
+                    return batchMSEs
+
+            epoch += 1        
+
+        return batchMSEs
 
     def transfer(self, x):
         if self.function == 'sig':
-            return 1 / (1+np.exp(-x))
+            return np.tanh(x)
         elif self.function == 'lin':
             return self.c * x
 
     def d_transfer(self, x):
         if self.function == 'sig':
-            temp = self.transfer(x)
-            return temp * (1 - temp)
+            return np.cosh(x) ** -2
         elif self.function == 'lin':
             return self.c
+    
 
 if __name__ == "__main__":
-    MLP = MLPNetwork(2, 1, 'sig', 0.1, 0.9, [3, 2])
-    print(MLP.shape)
-    print(MLP.weights)
+    # make parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument('dataset', help='The name of the dataset in ../data to use')
+    parser.add_argument('inputs', type=int, help='The number of input nodes (should match dataset)')
+    parser.add_argument('layerConfig', nargs='*', type=int, help='The number of nodes in each hidden layer. Each value represents a layer.')
+    args = parser.parse_args()
+
+    if len(args.layerConfig) > 0 and not all(args.layerConfig):
+        raise ValueError('Invalid layerconfig ' + layerConfig)
+
+    data = readDatasetFromFile(args.dataset)
+
+    network = MLPNetwork(args.inputs, 1, 'sig', args.layerConfig)
+    error = network.train(data)
+
+    netName = 'mlp-n{}'.format('-'.join(map(str, network.shape)))
+    print('finished training network ' + netName)
+
+    errorFile = netName + '-error.csv'
+    print('printing MSE values to ' + errorFile)	
+    with open(errorFile, 'w') as f:
+        f.writelines('\n'.join(map(str, error)))
+
+    summaryFile = netName + '-summary.txt'
+    print('printing network summary to ' + summaryFile)
+    with open(summaryFile, 'w') as f:
+        f.write('n=' + str(args.inputs) + '\n')
+        f.write('shape=' + str(network.shape) + '\n')
+        f.write('weights=' + str(network.weights) + '\n')

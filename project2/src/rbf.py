@@ -45,6 +45,8 @@ class RBF:
 		epochLimit = 1000
 		weightChangeLimiter = 0
 
+		printcounter = 0
+
 		start = datetime.now()
 		def checkTimeMinutes():
 			return (datetime.now() - start).total_seconds() // 60
@@ -65,11 +67,11 @@ class RBF:
 					self.weights = self.weights - self.eta * gradient
 
 					# some accounting
-					batchError = np.mean([e ** 2 for e in error])
-					print('epoch\t{}\tbatch\t{}\tmins_elapsed\t{}\terror_mse\t{}'
-							.format(epoch, i, checkTimeMinutes(), batchError))
-
-					if i == len(batches) - 1:
+					printcount += m
+					if m > 1000:
+						batchError = np.mean([e ** 2 for e in error])
+						print('epoch\t{}\tbatch\t{}\tmins_elapsed\t{}\terror_mse\t{}'
+								.format(epoch, i, checkTimeMinutes(), batchError))
 						batchMSEs.append(batchError)
 
 				epoch += 1
