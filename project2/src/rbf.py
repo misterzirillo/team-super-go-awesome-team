@@ -4,21 +4,24 @@ import functools
 import argparse
 from itertools import product
 from datetime import datetime
-from main import readDatasetFromFile
+from main import readDatasetFromFile, fileRelativeToHere
+import re
 
 class RBF:
 
 	#set the number of inputs, the number of hidden nodes, and the number of outputs
-	def __init__(self, k, trainingData, eta):
+	def __init__(self, k, trainingData, eta, n=None):
 
 		self.trainingData = np.asarray(trainingData)
 
 		# the argument dimension > 1
-		self.n = len(trainingData[0][0])
+		if trainingData:
+			self.n = len(trainingData[0][0])
+		else:
+			self.n = n
 
 		#set some tunable parameters that may or may not get adjusted
 		self.eta = eta
-
 		self.centers = list(map(np.asarray, centers(k, self.n)))
 		self.k = len(self.centers)
 
@@ -88,6 +91,17 @@ class RBF:
 		hiddenLayerOutput = np.fromiter(map(lambda c: guassian(input, c, self.sigma), self.centers), np.float)
 		return hiddenLayerOutput
 
+	def doTest(self, dataset):
+		inputs, actuals = zip(*dataset)
+		X = np.asarray(list(map(self.propagateToHiddenLayer, inputs)))
+		weightedSums = X.dot(self.weights) # activation function of output node
+		m = len(dataset)
+		_, error = doGDForBatch(X, weightedSums, actuals, m)
+
+		mse = np.mean([e**2 for e in error])
+		return mse
+
+
 
 def doGDForBatch(x, h, y, m):
 	error = h - y
@@ -131,6 +145,30 @@ def centers(k, argDimension):
 	perms = list(product(gridStep, repeat=argDimension))
 	
 	return perms
+
+def loadNetwork(networkSummaryFilename):
+
+	summaryFile = fileRelativeToHere('../nets/' + networkSummaryFilename)
+	allLines = []
+	with open(summaryFile, 'r') as f:
+		for l in f:
+			allLines.append(l)
+
+	# parse weights
+	weightstr = ''.join(allLines[2:]).split('=')[1]
+	weightstr = re.sub('\n', '', weightstr)
+	weightstr = re.sub('\s+', ',', weightstr)
+	weightstr = re.sub(',', '', weightstr, count=1)
+
+	n = eval(allLines[0].split('=')[1].lstrip())
+	weights = np.array(eval(weightstr))
+	k = len(weights)
+
+	network = RBF(k, None, 0.1, n=n)
+	network.weights = weights
+
+	return network
+
 
 if __name__ == '__main__':
 	# make parser
