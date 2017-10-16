@@ -65,7 +65,7 @@ class MLPNetwork(object):
         batchSize = 2 ** (self.shape[0] + 2)
         batches = get_mini_batches(dataset, batchSize)
 
-        timelimitMinutes = 1
+        timelimitMinutes = 30
         batchMSEs =[]
         epoch = 0
         notConverged = True
@@ -82,8 +82,8 @@ class MLPNetwork(object):
             for batchnum, batch in enumerate(batches):
                 delta = []
                 X, Y = zip(*batch)
-                x = np.asarray(X, dtype='int64')
-                y = np.asarray(Y)
+                x = np.asarray(X, dtype='float64')
+                y = np.asarray(Y, dtype='float64')
 
                 inputs = x.shape[0]
 
@@ -122,7 +122,6 @@ class MLPNetwork(object):
                     print('epoch\t{}\tbatch\t{}\tmins_elapsed\t{}\terror_mse\t{}'
                                 .format(epoch, batchnum, checkTimeMinutes(), error))
                     printcount = 0
-                    return batchMSEs
 
             epoch += 1        
 
