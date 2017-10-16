@@ -1,5 +1,4 @@
-TODO
-Matt Cirillo - something
-Henry King - something
-Jake Dancyzk - something else
-Justin Braun - 
+Matt Cirillo - RBF, grid-centers
+Henry King - RBF, paper, logistics
+Jake Dancyzk - MLP, RBF
+Justin Braun - MLP

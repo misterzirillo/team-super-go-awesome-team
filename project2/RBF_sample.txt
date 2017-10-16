@@ -1,0 +1,70 @@
+>>> import rbf
+>>> net = rbf.loadNetwork('rbf-n4-k256-summary.txt')
+>>> import main
+>>> dataset = main.readDatasetFromFile('n4-test')
+>>> net.doTest(dataset[:10])
+41679047.134907566
+>>> net.doTest(dataset[10:20])
+60037766.252155483
+>>> net.doTest(dataset[30:40])
+38698204.445577368
+>>> net.doTest(dataset[40:50])
+82593968.212175995
+>>> net.doTest(dataset[50:60])
+89082950.641059309
+>>> net.doTest(dataset[60:70])
+43534962.22949598
+>>> net.doTest(dataset[70:80])
+24389143.409368146
+>>> net.doTest(dataset[80:90])
+10071363.559990747
+>>> net.doTest(dataset[90:100])
+78987890.052044362
+>>> net.doTest(dataset)
+37639609.447209165
+________________________________________________________________________________________
+
+src>python rbf.py n6-train 64
+...
+epoch   23      batch   353     mins_elapsed    30.0    error_mse       115875691.89466412
+epoch   23      batch   354     mins_elapsed    30.0    error_mse       130929210.34248325
+epoch   23      batch   355     mins_elapsed    30.0    error_mse       119381462.62073435
+epoch   23      batch   356     mins_elapsed    30.0    error_mse       114219150.3411046
+epoch   23      batch   357     mins_elapsed    30.0    error_mse       98992013.99998835
+epoch   23      batch   358     mins_elapsed    30.0    error_mse       146718334.5033489
+epoch   23      batch   359     mins_elapsed    30.0    error_mse       132399917.19074844
+epoch   23      batch   360     mins_elapsed    30.0    error_mse       128339495.93479927
+epoch   23      batch   361     mins_elapsed    30.0    error_mse       143800923.9916192
+epoch   23      batch   362     mins_elapsed    30.0    error_mse       114240593.85655153
+epoch   23      batch   363     mins_elapsed    30.0    error_mse       114067873.101428
+epoch   23      batch   364     mins_elapsed    30.0    error_mse       131696986.29531127
+epoch   23      batch   365     mins_elapsed    30.0    error_mse       136648439.266257
+epoch   23      batch   366     mins_elapsed    30.0    error_mse       125429437.0963152
+epoch   23      batch   367     mins_elapsed    30.0    error_mse       109190566.18297634
+epoch   23      batch   368     mins_elapsed    30.0    error_mse       126063028.01921992
+epoch   23      batch   369     mins_elapsed    30.0    error_mse       132348483.17555383
+epoch   23      batch   370     mins_elapsed    30.0    error_mse       129499079.63286035
+epoch   23      batch   371     mins_elapsed    30.0    error_mse       131901470.30033793
+epoch   23      batch   372     mins_elapsed    30.0    error_mse       131265869.54288322
+epoch   23      batch   373     mins_elapsed    30.0    error_mse       140897229.35964605
+epoch   23      batch   374     mins_elapsed    30.0    error_mse       134860374.9390745
+epoch   23      batch   375     mins_elapsed    30.0    error_mse       113588844.51660821
+epoch   23      batch   376     mins_elapsed    30.0    error_mse       128266939.71212223
+epoch   23      batch   377     mins_elapsed    30.0    error_mse       126691448.00722057
+epoch   23      batch   378     mins_elapsed    30.0    error_mse       122946395.2481407
+epoch   23      batch   379     mins_elapsed    30.0    error_mse       127309809.70634803
+epoch   23      batch   380     mins_elapsed    30.0    error_mse       125662975.6542919
+epoch   23      batch   381     mins_elapsed    30.0    error_mse       126724960.54689112
+epoch   23      batch   382     mins_elapsed    30.0    error_mse       138460912.31905124
+epoch   23      batch   383     mins_elapsed    30.0    error_mse       122086581.19212049
+epoch   23      batch   384     mins_elapsed    30.0    error_mse       126003487.07795197
+epoch   23      batch   385     mins_elapsed    30.0    error_mse       123968374.735879
+epoch   23      batch   386     mins_elapsed    30.0    error_mse       113798849.7016658
+epoch   23      batch   387     mins_elapsed    30.0    error_mse       128680379.0588527
+epoch   23      batch   388     mins_elapsed    30.0    error_mse       138202426.97044745
+epoch   23      batch   389     mins_elapsed    30.0    error_mse       136524404.53020856
+epoch   23      batch   390     mins_elapsed    30.0    error_mse       131928933.34669104
+finished training network rbf-n6-k64
+printing MSE epoch values to rbf-n6-k64-error.csv
+printing network summary to rbf-n6-k64-summary.txt
+
