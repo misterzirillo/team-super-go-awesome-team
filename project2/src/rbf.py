@@ -7,10 +7,11 @@ from datetime import datetime
 from main import readDatasetFromFile, fileRelativeToHere
 import re
 
+# represents an instance of a RBF neural network
 class RBF:
 
 	#set the number of inputs, the number of hidden nodes, and the number of outputs
-	def __init__(self, k, trainingData, eta, n=None):
+	def __init__(self, proposedK, trainingData, eta, n=None):
 
 		self.trainingData = np.asarray(trainingData)
 
@@ -21,8 +22,8 @@ class RBF:
 			self.n = n
 
 		#set some tunable parameters that may or may not get adjusted
-		self.eta = eta
-		self.centers = list(map(np.asarray, centers(k, self.n)))
+		self.eta = eta # learning rate
+		self.centers = list(map(np.asarray, centers(proposedK, self.n)))
 		self.k = len(self.centers)
 
 		# determine max distance each center to all other centers
@@ -33,7 +34,9 @@ class RBF:
 		self.weights = np.ones(self.k)
 		
 
-    #one pass of gradient descent on the weights from the hidden layer to the output
+    # iteratively train the network using the training data passed in to the constructor
+	# training will run for a maximum of 1000 iterationss of the whole dataset or 30 minutes
+	# uses a mini-batch update methodology
 	def train(self):
 		#in general compare the output to the actual and adjust using the adaline learning rule
 		#Weights = Weights + eta(actual value at input - ouput of the network at input)* input vector
@@ -84,13 +87,14 @@ class RBF:
 		
 		return batchMSEs
 				
-
+	# this method returns an array of the outputs from each radial basis function
 	def propagateToHiddenLayer(self, input):
 		#pass all the inputs to the k hidden nodes
 		# and computer gaussian for each node
 		hiddenLayerOutput = np.fromiter(map(lambda c: guassian(input, c, self.sigma), self.centers), np.float)
 		return hiddenLayerOutput
 
+	# helper to analyze MSE over a dataset that is parsed via the main.readDatasetFromFile function
 	def doTest(self, dataset):
 		inputs, actuals = zip(*dataset)
 		X = np.asarray(list(map(self.propagateToHiddenLayer, inputs)))
@@ -101,17 +105,19 @@ class RBF:
 		mse = np.mean([e**2 for e in error])
 		return mse
 
+''' HELPERS '''
 
-
+# batch gradient descent method for input vector x, hypothesis vector h, actual value y, and data size m
 def doGDForBatch(x, h, y, m):
 	error = h - y
 	gradient = x.T.dot(error) / m
 	return (gradient, error)
 
+# distance between vectors
 def distance(x, y):
 	return np.linalg.norm(x - y)
 
-#the activation function of the hidden nodes
+#the activation function of our hidden nodes
 def guassian(input, center, sigma):
 	#apply this function to the weighted sum at each hidden node
 	#it will be the hyperbolic tangent function in our case
@@ -119,22 +125,29 @@ def guassian(input, center, sigma):
 
 	return math.exp(-1 * ((dist**2) / (2 * sigma**2)))
 
-# given a dataset return minibatches 
+# given a dataset, return minibatches using a random sampling with replacement mechanism
 def get_mini_batches(dataset, batch_size):
 	random_idxs = np.random.choice(len(dataset), len(dataset), replace=True)
 	X_shuffled = list(map(lambda i: dataset[i], random_idxs))
 	mini_batches = [X_shuffled[i:i+batch_size] for i in range(0, len(dataset), batch_size)]
 	return mini_batches
 
-def centers(k, argDimension):
+# given a desired number of centers k and the dimension of the input vector
+# return the centers that will represent each radial basis function node in
+# our network. We want the centers to be laid out in a grid fashion, so the
+# number of centers returned may differ from the proposed k.
+def centers(proposedK, argDimension):
 
-	if k < 2: raise ValueError('k < 2')
+	if proposedK < 2: raise ValueError('k < 2')
 	if argDimension < 1: raise ValueError('argDimension < 1')
 
-	kRoot = k**(1/float(argDimension))
-	gridInterval = float(6) / (kRoot - 1)
-	#print(gridInterval)
+	# find the number of grid lines for each "side" of the input space
+	kRoot = proposedK**(1/float(argDimension))
 
+	# divide the input space along those grid lines
+	gridInterval = float(6) / (kRoot - 1)
+
+	# get the coordinates of each grid line from -3 to 3 (interesting points in rosenbrock)
 	gridStep = [-3.0]
 	it = 1
 	while (-3 + it * gridInterval < 3):
@@ -142,10 +155,12 @@ def centers(k, argDimension):
 		it = it + 1
 	gridStep.append(3.0)
 
+	# permute grid line values to get every point in the grid
 	perms = list(product(gridStep, repeat=argDimension))
 	
 	return perms
 
+# re-create a saved network
 def loadNetwork(networkSummaryFilename):
 
 	summaryFile = fileRelativeToHere('../nets/' + networkSummaryFilename)
@@ -169,7 +184,7 @@ def loadNetwork(networkSummaryFilename):
 
 	return network
 
-
+# usage: python rbf.py 'dataset-name-from-data-folder' proposed-K
 if __name__ == '__main__':
 	# make parser
 	parser = argparse.ArgumentParser()

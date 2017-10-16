@@ -3,7 +3,9 @@ from rbf import get_mini_batches
 from datetime import datetime
 import math
 import argparse
-from main import readDatasetFromFile
+from main import readDatasetFromFile, fileRelativeToHere
+from numpy import array
+import re
 
 class MLPNetwork(object):
 
@@ -56,9 +58,22 @@ class MLPNetwork(object):
                 layer_in = self.weights[i].dot(np.vstack([self.layer_out[-1], np.ones([1, inputs])]))
 
             self.layer_in.append(layer_in)
-            self.layer_out.append(self.transfer(layer_in))
+            if i < self.layers - 1:
+                self.layer_out.append(self.transfer(layer_in))
+            else:
+                self.layer_out.append(layer_in) # output node should not use transfer fn
 
         return self.layer_out[-1].T
+
+    def propTestData(self, testdata):
+
+        # testdata is in list[tuple] form so unpack it
+        X, Y = zip(*testdata)
+        x = np.asarray(X, dtype='float64')
+        y = np.asarray(Y, dtype='float64')
+
+        return self.feed_forward(x)
+
 
     def train(self, dataset):
 
@@ -127,18 +142,41 @@ class MLPNetwork(object):
 
         return batchMSEs
 
-    def transfer(self, x):
-        if self.function == 'sig':
+    def transfer(self, x, fn):
+        if self.fn == 'sig':
             return np.tanh(x)
         elif self.function == 'lin':
             return self.c * x
 
-    def d_transfer(self, x):
+    def d_transfer(self, x, fn):
         if self.function == 'sig':
             return np.cosh(x) ** -2
         elif self.function == 'lin':
             return self.c
     
+
+def loadNetwork(networkSummaryFilename):
+    network = MLPNetwork(0,0,'sig', []) # create dummy net
+
+    summaryFile = fileRelativeToHere('../nets/' + networkSummaryFilename)
+    allLines = []
+    with open(summaryFile, 'r') as f:
+        for l in f:
+            allLines.append(l)
+
+    # parse shape
+    shape = eval(allLines[1].split('=')[1].lstrip())
+
+    # parse weights
+    weightstr = ''.join(allLines[2:]).split('=')[1]
+    weights = eval(weightstr)
+
+    network.weights = weights
+    network.shape = shape
+    network.layers = len(shape) - 1
+
+    return network
+
 
 if __name__ == "__main__":
     # make parser
