@@ -122,7 +122,6 @@ class MLPNetwork(object):
                     print('epoch\t{}\tbatch\t{}\tmins_elapsed\t{}\terror_mse\t{}'
                                 .format(epoch, batchnum, checkTimeMinutes(), error))
                     printcount = 0
-                    return batchMSEs
 
             epoch += 1        
 
