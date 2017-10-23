@@ -17,7 +17,7 @@ class MLPNetwork(object):
     def __init__(self, inputs, outputs, transfer, hidden=[]):
 
         # Network Basic Properties
-        self.learning_rate = .1
+        self.learning_rate = .01
         self.momentum = .5
         self.function = transfer
         self.c = 1.0
@@ -36,7 +36,7 @@ class MLPNetwork(object):
 
         # Weight Arrays
         for (i, j) in zip(self.shape[:-1], self.shape[1:]):
-            self.weights.append(np.random.normal(scale=0.1, size=(j, i + 1)))
+            self.weights.append(np.random.normal(scale=1, size=(j, i + 1)))
             self.previous_delta.append(np.zeros((j, i + 1)))
 
     # Runs data through network
@@ -58,10 +58,7 @@ class MLPNetwork(object):
                 layer_in = self.weights[i].dot(np.vstack([self.layer_out[-1], np.ones([1, inputs])]))
 
             self.layer_in.append(layer_in)
-            if i < self.layers - 1:
-                self.layer_out.append(self.transfer(layer_in))
-            else:
-                self.layer_out.append(layer_in) # output node should not use transfer fn
+            self.layer_out.append(self.transfer(layer_in, i == self.layers - 1))
 
         return self.layer_out[-1].T
 
@@ -77,7 +74,7 @@ class MLPNetwork(object):
 
     def train(self, dataset):
 
-        batchSize = 2 ** (self.shape[0] + 2)
+        batchSize = 2 **(2 + self.shape[0])
         batches = get_mini_batches(dataset, batchSize)
 
         timelimitMinutes = 30
@@ -89,7 +86,8 @@ class MLPNetwork(object):
 
         start = datetime.now()
         def checkTimeMinutes():
-            return (datetime.now() - start).total_seconds() // 60
+            #return (datetime.now() - start).total_seconds() // 60
+            return 0
 
         while notConverged and checkTimeMinutes() < timelimitMinutes:
 
@@ -107,11 +105,18 @@ class MLPNetwork(object):
                 for i in reversed(range(self.layers)):
                     if i == self.layers - 1:
                         out_delta = self.layer_out[i] - y.T
-                        error = np.mean(out_delta**2)
-                        delta.append(out_delta * self.d_transfer(self.layer_in[i]))
+                        error = np.mean(out_delta**2) # MSE
+                        #print(error)
+                        if math.isnan(error):
+                            return
+                        
+                        d = out_delta / len(y)
+                        #return d
+                        delta.append(d)
+                        #return (d)w
                     else:
                         int_delta = self.weights[i + 1].T.dot(delta[-1])
-                        delta.append(int_delta[:-1, :] * self.d_transfer(self.layer_in[i]))
+                        delta.append(int_delta[:-1, :] * self.d_transfer(self.layer_in[i], False))
 
                 for i in range(self.layers):
                     delta_i = self.layers - 1 - i
@@ -132,26 +137,27 @@ class MLPNetwork(object):
                     self.previous_delta[i] = weight_delta
 
                 printcount += inputs
-                if printcount > 1000:
+                if printcount > 10000:
                     batchMSEs.append(error)
-                    print('epoch\t{}\tbatch\t{}\tmins_elapsed\t{}\terror_mse\t{}'
-                                .format(epoch, batchnum, checkTimeMinutes(), error))
+                    s = 'epoch\t{}\tbatch\t{}\tmins_elapsed\t{}\terror_mse\t{}'.format(epoch, batchnum, checkTimeMinutes(), error)
+                    print(s)
                     printcount = 0
 
-            epoch += 1        
+            epoch += 1
+            notConverged = error > 1
 
         return batchMSEs
 
-    def transfer(self, x, fn):
-        if self.fn == 'sig':
+    def transfer(self, x, output):
+        if not output:
             return np.tanh(x)
-        elif self.function == 'lin':
+        else:
             return self.c * x
 
-    def d_transfer(self, x, fn):
-        if self.function == 'sig':
+    def d_transfer(self, x, output):
+        if not output:
             return np.cosh(x) ** -2
-        elif self.function == 'lin':
+        else:
             return self.c
     
 
