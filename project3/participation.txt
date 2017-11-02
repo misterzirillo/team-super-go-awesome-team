@@ -1,0 +1,4 @@
+Matt Cirillo - RBF, grid-centers
+Henry King - RBF, paper, logistics
+Jake Dancyzk - MLP, RBF
+Justin Braun - MLP

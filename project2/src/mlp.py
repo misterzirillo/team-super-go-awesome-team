@@ -74,7 +74,7 @@ class MLPNetwork(object):
 
     def train(self, dataset):
 
-        batchSize = 2 **(2 + self.shape[0])
+        batchSize = len(dataset)#2 **(2 + self.shape[0])
         batches = get_mini_batches(dataset, batchSize)
 
         timelimitMinutes = 30
