@@ -9,13 +9,14 @@ class EA(ABC):
     
     pop = []
     
-    def __init__(self, shape, maxGen):
+    def __init__(self, shape, mu):
         self.shape=shape
-        self.maxGen= maxGen
+        self.mu = mu
+        self.initializePop(mu)
         
         
     @abstractmethod
-    def train(self, data):
+    def train(self, data, maxGenerations = 1000000):
         pass
     
         #generate a random population
