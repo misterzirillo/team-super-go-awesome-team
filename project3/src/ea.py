@@ -37,18 +37,17 @@ class EA(ABC):
 
     #generate offspring according to the crossover rate
     #global, uniform
+    # should return a whole new copy of the population
+    # example: self.pop = self.crossOver()
     @abstractmethod
     def crossOver(self):
         pass
 
     #mutate the offspring according to the mutatation rate
+    # should return a whole new copy of the population
+    # example: self.pop = self.mutate()
     @abstractmethod
     def mutate(self):
-        pass
-
-    #insert the offspring into the population
-    @abstractmethod
-    def replace(self):
         pass
     
     #take a weight matrix and represent it as a string
