@@ -8,11 +8,13 @@ import numpy as np
 class EA(ABC):
     
     pop = []
+    numWeights =0
     
     def __init__(self, shape, mu):
         self.shape=shape
         self.mu = mu
         self.initializePop(mu)
+        self.numWeights = sum([self.shape[i] * self.shape(i + 1) for i in range(len(self.shape - 1))])
         
         
     @abstractmethod
@@ -21,7 +23,6 @@ class EA(ABC):
     
         #generate a random population
     def initializePop(self, mu):
-        numWeights = sum([self.shape[i] * self.shape(i + 1) for i in range(len(self.shape - 1))])
         self.pop = [np.random.uniform(size=numWeights) for i in range(mu)]
           
     #evaluate the fitness of the population on some loss function
