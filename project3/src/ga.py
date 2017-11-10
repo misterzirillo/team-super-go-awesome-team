@@ -66,19 +66,6 @@ class GA(EA):
             if(t== maxGen):
                 #return(best)
                 break
-          
-    #evaluate the fitness of the population on some loss function
-    def evaluateFitness(self, individual, x, y): 
-
-        # maybe optimize this later with pre-created networks
-        rehydrated = MLPNetwork(self.shape)
-        rehydrated.weights = self.uncereal(individual)
-
-        hypothesis = rehydrated.propagate(x)
-
-        corrects = [hi.argmax() == yi.argmax() for hi, yi in zip(hypothesis, y)]
-
-        return (np.sum(corrects) / len(y)) * 100
     
     #select the parents from the population
     #rank based

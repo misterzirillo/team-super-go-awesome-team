@@ -1,10 +1,13 @@
 from ea import EA
+import random
 
 class MuLambda(EA):
 
-    def __init__(self, shape, mu, lambdeh):
+    def __init__(self, shape, mu, lambdeh, alpha):
         super().__init__(shape, mu)
         self.lambdeh = lambdeh
+        self.sigma = 1
+        self.alpha = alpha
 
         if lambdeh % 2 != 0:
             raise "Lamda is not divis 2 fix it"
@@ -33,7 +36,7 @@ class MuLambda(EA):
             t = t +1
             self.selectFrom()
             offSpring = self.crossOver()
-            newPop = self.mutate(offSpring)
+            newPop = self.mutate(offSpring, self.parents, x, y)
             #print(offSpring)
 
             #add each child to population
@@ -142,10 +145,32 @@ class MuLambda(EA):
         while(len(self.parents) < (self.lambdeh / 2) + 1): # while not enough parents
             num = random.uniform(0, sum(Pxi))
 
-            for i in len(wheel):
+            for i in range(len(wheel)):
                 if wheel[i][0] > num:
                     self.parents.append(wheel[i][1])
                     del wheel[i]
+                    break
 
-    def mutate(self):
-        pass
+    def mutate(self, childrens, parents, x, y):
+
+        parents = list(map(lambda i: self.pop[i[0]], parents)) # get actual parent objs
+        avgParentsFitness = sum(getAllFitness(self, parents, x, y)) / len(parents)
+        childrensFitness = getAllFitness(self, childrens, x, y)
+
+        oneFifthBetter = len(list(filter(lambda fitness: fitness >= avgParentsFitness, childrensFitness))) / len(childrens) > .2
+
+        if oneFifthBetter:
+            self.sigma *= self.alpha
+        else:
+            self.sigma /= self.alpha
+
+        for i in range(len(childrens)):
+            for j in range(len(childrens[i])):
+                childrens[i][j] = random.normalvariate(0, self.sigma)
+                
+            #print(check)
+        return(childrens)
+
+
+def getAllFitness(network, guys, x, y):
+    return list(map(lambda guy: network.evaluateFitness(guy, x, y), guys))

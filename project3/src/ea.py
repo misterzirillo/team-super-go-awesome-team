@@ -32,13 +32,16 @@ class EA(ABC):
           
     #evaluate the fitness of the population on some loss function
     def evaluateFitness(self, individual, x, y): 
-        correctIndex = y.index(max(y)) # [0, 0, 1] -> 2
 
-        network = MLPNetwork(self.shape)
+        # maybe optimize this later with pre-created networks
+        rehydrated = MLPNetwork(self.shape)
+        rehydrated.weights = self.uncereal(individual)
 
-        hypothesis = individual.propagate(x)
-        hypothesizedIndex = hypothesis.index(max(hypothesis))
-        return sum(correctIndex == hypothesizedIndex) / len(y or x)
+        hypothesis = rehydrated.propagate(x)
+
+        corrects = [hi.argmax() == yi.argmax() for hi, yi in zip(hypothesis, y)]
+
+        return (np.sum(corrects) / len(y)) * 100
     
     #select the parents from the population
     @abstractmethod
