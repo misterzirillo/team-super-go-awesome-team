@@ -45,3 +45,6 @@ def readDatasetFromFile(filename, argStartIndex, argEndIndex, classIndex):
         ytransformed.append(numpy.array(zeros))
 
     return (numpy.array(x), numpy.array(ytransformed))
+
+def readZooData():
+    return readDatasetFromFile('zoo.data', 1, -1, -1)

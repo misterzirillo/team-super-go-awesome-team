@@ -22,7 +22,7 @@ class EA(ABC):
         
         
     @abstractmethod
-    def train(self, data, maxGenerations = 1000000):
+    def train(self):
         pass
     
         #generate a random population
