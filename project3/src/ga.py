@@ -40,15 +40,28 @@ class GA(EA):
             self.selectFrom()
             offSpring = self.crossOver()
             newPop = self.mutate(offSpring)
+            #print(offSpring)
+
             #add each child to population
             for i in range(len(newPop)):
-                self.fitness.update({len(self.pop) : self.evaluateFitness(newPop[i], x, y)})
+                self.pop.append(newPop[i])
+                        
+            #new pop list
+            self.sortPop = sorted(self.pop, key=lambda j:self.evaluateFitness(j, x, y))
+            self.pop = self.sortPop[len(newPop):]
             
+            #update
+            for i in range(len(self.pop)):
+                self.fitness.update({i : self.evaluateFitness(self.pop[i], x, y)})          
+            
+            #new sortFit list
             self.sortFit = sorted(self.fitness.items(), key=lambda x:x[1])
-            self.sortFit = self.sortFit[len(newPop):]
+ 
+            
             #store current best individual
-            best = max(self.fitness, key=(lambda key: self.fitness[key]))
-            print(best)
+            best = self.pop[-1]
+            
+            print(self.sortFit[-1][1])
             
             if(t== maxGen):
                 #return(best)
@@ -81,11 +94,13 @@ class GA(EA):
    
         Pxi = []
         wheel = []
+
         #assign probability of selection
         #calculate cumulative fitness and make roulette wheel
-        for i in range(0, n-1):
+        for i in range(len(self.pop)):
             #normalizer
             Pxi.append((lam2 + (i/(n-1)) * (lam1 - lam2)) / n)
+            
             wheel.append((sum(Pxi), self.sortFit[i]))
         
         #generate two random numbers in the range of the wheel to find parents        
