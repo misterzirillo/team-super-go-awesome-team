@@ -18,6 +18,7 @@ def fileRelativeToHere(relativePath):
 # x, y = helpers.readDatasetFromFile('zoo.data', 1, -1, -1)
 # zoo dataset has a non-feature in the first position so start looking at 
 # index 1. features continue until the last index, which is the class label
+# output is a tuple (x, y) where x is a matrix of input vectors, y is a matrix of output vectors
 def readDatasetFromFile(filename, argStartIndex, argEndIndex, classIndex):
     x = []
     y = []
