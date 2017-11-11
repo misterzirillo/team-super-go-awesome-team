@@ -22,8 +22,17 @@ class EA(ABC):
     def train(self):
         self.trainingErrors = []
         self.validationErrors =[]
-    
-        #generate a random population
+
+    #display structure stats
+    def check(self):
+        print("Network shape: "+ str(self.shape) + "\n"+ "Individual Length: " +  str(len(self.pop[1])) + "\n"+ "First five weights: " + str(self.pop[1][0:5]) + "\n")
+
+    #display fitness rankings
+    def checkFit(self):
+        for i in range(len(self.sortFit)):
+            print(self.sortFit[i])
+        
+    #generate a random population
     def initializePop(self, mu):
         self.builtNetworks = [MLPNetwork(self.shape) for whatever in range(mu)]
         self.pop = list(map(lambda net: self.cereal(net.weights), self.builtNetworks))
