@@ -39,7 +39,7 @@ class DE(EA):
         
         #select the target, the best individual (x1)
         if(xi == best):
-            x1 = self.grabDude(dudes)
+            x1 = self.pop[-2]
             dudes.append(x1)
         else:
             x1 = best
