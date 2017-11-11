@@ -7,7 +7,7 @@ class MuLambda(EA):
     def __init__(self, shape, mu, lambdeh, alpha):
         super().__init__(shape, mu)
         self.lambdeh = lambdeh
-        self.sigma = 10
+        self.sigma = 100
         self.alpha = alpha
 
         if lambdeh % 2 != 0:
@@ -121,11 +121,12 @@ class MuLambda(EA):
         if oneFifthBetter:
             self.sigma *= self.alpha
         else:
-            self.sigma /= self.alpha
+            self.sigma = self.sigma / self.alpha
+            
 
         for i in range(len(childrens)):
             for j in range(len(childrens[i])):
-                childrens[i][j] = random.normalvariate(0, self.sigma)
+                childrens[i][j] += random.normalvariate(0, self.sigma)
                 
             #print(check)
         return(childrens)

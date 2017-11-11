@@ -23,13 +23,10 @@ class MLPNetwork:
         self.previous_delta = []
         self.weights = []
 
-        self.trueShape = []
-
         # Weight Arrays
         for (i, j) in zip(self.shape[:-1], self.shape[1:]):
             self.weights.append(np.random.normal(scale=1, size=(j, i + 1)))
             self.previous_delta.append(np.zeros((j, i + 1)))
-            self.trueShape.append((j, i + 1))
         
     # Runs data through network
     # data should be a x by n numpy array where n is the number of features

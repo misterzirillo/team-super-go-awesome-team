@@ -16,9 +16,6 @@ class EA(ABC):
         self.shape=shape
         self.mu = mu
         self.initializePop(mu)
-
-        self.trueShape = [n + 1 for n in shape[:-1]]
-        self.trueShape.append(self.shape[-1])
         
         
     @abstractmethod
@@ -73,15 +70,11 @@ class EA(ABC):
 
     def uncereal(self, arr): 
         lastIndex = 0 
-        acc = [] 
-        #print(self.trueShape)
-        #print([w.shape for w in self.builtNetworks[0].weights])
+        acc = []
         for layer, nextLayer in zip(self.shape[:-1], self.shape[1:]): 
             numWeights = (layer+1) * nextLayer
-            #print(numWeights)
             newLastIndex = lastIndex + numWeights
             weightsForLayer = np.reshape(np.array(arr[lastIndex:newLastIndex]), [nextLayer, layer+1]) 
-            #print(weightsForLayer.shape)
             acc.append(weightsForLayer) 
             lastIndex = newLastIndex
         return acc

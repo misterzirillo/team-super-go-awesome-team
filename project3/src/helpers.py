@@ -31,7 +31,7 @@ def readDatasetFromFile(filename, argStartIndex, argEndIndex, classIndex):
             linearr = line.split(',')
             arg = numpy.fromiter(map(float, linearr[argStartIndex : argEndIndex]), numpy.float64)
             
-            output = linearr[-1]
+            output = linearr[classIndex]
             if output not in outs:
                 outs[output] = outCount
                 outCount += 1
@@ -49,10 +49,13 @@ def readDatasetFromFile(filename, argStartIndex, argEndIndex, classIndex):
     return (numpy.array(x), numpy.array(ytransformed))
 
 def readZooData():
-    return readDatasetFromFile('zoo.data', 1, 7, -1)
+    return readDatasetFromFile('zoo.data', 1, 17, -1) # need shape [16 .. 7]
 
 def readLeafData():
-    return readDatasetFromFile('leaf.csv', 2, 16, 0)
+    return readDatasetFromFile('leaf.csv', 2, 16, 0) # need shape [14 ... 36]
+
+def readPokerData():
+    return readDatasetFromFile('poker-hand-training-true.data', 0, 10, 10) # need shape [10 ... 10]
 
 # CV helpers
 def get2Fold(x, y):

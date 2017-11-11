@@ -15,7 +15,7 @@ class GA(EA):
         print(self.shape, self.trueShape, len(self.pop[1]), self.pop[1][1:10])
         
     
-    def train(self, x, y, maxGen):
+    def train(self, x, y, valX, valY, maxGen):
         super().train() # sets up some vars
         #mark the time step, or generation
         t = 0
@@ -34,7 +34,8 @@ class GA(EA):
         #store current best individual
         best = max(self.fitness, key=(lambda key: self.fitness[key]))
 
-        while(t <= maxGen):
+        converged = False
+        while(t <= maxGen and not converged):
             #create test_fold
             
             t = t +1
@@ -63,10 +64,9 @@ class GA(EA):
             best = self.pop[-1]
             
             #print(self.sortFit[-1][1])
+            self.postIterationProcess(valX, valY)
             
-            if(t== maxGen):
-                #return(best)
-                break
+            
     
     #select the parents from the population
     #rank based
