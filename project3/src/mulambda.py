@@ -7,7 +7,7 @@ class MuLambda(EA):
     def __init__(self, shape, mu, lambdeh, alpha):
         super().__init__(shape, mu)
         self.lambdeh = lambdeh
-        self.sigma = 1
+        self.sigma = 10
         self.alpha = alpha
 
         if lambdeh % 2 != 0:
