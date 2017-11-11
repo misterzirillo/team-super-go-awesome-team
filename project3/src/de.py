@@ -11,26 +11,61 @@ class DE(EA):
         self.beta = beta
         self.pr = proboRecombo
 
-    def check(self):
-        print("Network shape: "+ str(self.shape) + "\n"+ "Individual Length: " +  str(len(self.pop[1])) + "\n"+ "First five weights: " + str(self.pop[1][0:5]) + "\n")
 
     def crossOver(self, parent, trialVec):
         #use the trial vectors to create offspring
-
+        mask = []
+        spawn = []
         #uniform crossover between parent and trial vector
+        #build mask
+        for i in range(len(parent)):
+            mask.append(random.randint(0, 1))
 
-        #compare parent to child, winner survives
-        pass
+        #construct child
+        for i in range(len(parent)):
+            if mask[i] == 1:
+                spawn.append(parent[i])
+            else:
+                spawn.append(trialVec[i])
+        #print(len(spawn), spawn[0:2])
+        return(spawn)
 
-    def mutate(self, parent):
-        #for each parent (xi)
+    def mutate(self, parent, best):
+        dudes =[]
 
+        #parent (xi)
+        xi = parent
+        dudes.append(xi)
+        
         #select the target, the best individual (x1)
-
+        x1 = best
+        dudes.append(x1)
+        
         #randomly select two different(x2,x3 !=x1, xi)
-
+        x2 = self.grabDude(dudes)
+        dudes.append(x2)
+        x3 = self.grabDude(dudes)
+        dudes.append(x3)
+        # print("xi " + str(xi[0:2]))
+        # print("x1 " + str(x1[0:2]))
+        # print("x2 " + str(x2[0:2]))
+        # print("x3 " + str(x3[0:2]))
         #create trial vector, append to list of trial vectors
-        pass
+        ut=[]
+        for i in range(len(xi)):
+            ut.append(x1[i] + self.beta*(x2[i]-x3[i]))
+        #print(len(ut), ut[0:3])
+        return(ut)
+
+    #get a guy that ain't in dudes
+    def grabDude(self, dudes):
+            while(True):
+                #random position in population
+                x = self.pop[random.randint(0,len(self.pop)-1)]
+                if x in dudes:
+                    continue
+                else:
+                    return(x)
 
     def selectFrom(self):
         pass
@@ -48,53 +83,58 @@ class DE(EA):
             self.fitness.update({i : self.evaluateFitness(self.pop[i], x, y)})
         #sort by fitness
         self.sortFit = sorted(self.fitness.items(), key=lambda x:x[1])
-        #store current best individual
+        
         best = max(self.fitness, key=(lambda key: self.fitness[key]))
+        print ("Current Best at "+str(best) + " with fitness ", str(self.fitness[best]))
 
-        # ###Loop###
-        # while(t <= maxGen and not converged):
-        #     #nextGen
-        #     t = t +1
-        #     newPop = []
+        #sort population by fitness
+        self.sortPop = sorted(self.pop, key=lambda j:self.evaluateFitness(j, x, y))
+        self.pop = self.sortPop
 
-        #     #for each individual
-        #     for i in range(self.pop):
-        #         guy = self.pop[i]
-        #         #evaluate fitness
-        #         fit = self.evaluateFitness(guy, x, y)
-        #         #create trial vector, mutate
-        #         tv = self.mutate(guy)
-        #         #create the offspring, crossover
-        #         offSpring = self.crossOver(guy, tv)
-        #         newFit = self.evaluateFitness(offSpring, x, y)
-        #         #if child better than parent
-        #         if newFit > fit:
-        #             #add child to nextPop
-        #             newPop.append(offSpring)
-        #         #else add parent to nextPop
-        #         else:
-        #             newPop.append(guy)
+        print(self.evaluateFitness(self.sortPop[-1],x,y))
+        print(self.evaluateFitness(self.pop[-1],x,y))
+        print(len(self.sortPop))
+        
+        ##Loop###
+        converged = False
+        while(t <= maxGen and not converged):
+            #nextGen
+            t = t +1
+            newPop = []
 
-        #     #generational replacement
-        #     self.pop = newPop
-            
-        #     #check convergence
-        #     converged = self.postIterationProcess(validationX, validationY)
+            #store current best individual
+            best = self.pop[-1]
 
-        #     #new pop list
-        #     #self.sortPop = sorted(self.pop, key=lambda j:self.evaluateFitness(j, x, y))
-        #     #self.pop = self.sortPop[len(newPop):]
+            #for each individual
+            for i in range(len(self.pop)):
+                guy = self.pop[i]
+                #evaluate fitness
+                fit = self.evaluateFitness(guy, x, y)
+                # print(fit)
+                #create trial vector, mutate
+                tv = self.mutate(guy, best)
+                #create the offspring, crossover
+                offSpring = self.crossOver(guy, tv)
+                newFit = self.evaluateFitness(offSpring, x, y)
+                #if child better than parent
+                if newFit > fit:
+                    #add child to nextPop
+                    newPop.append(offSpring)
+                #else add parent to nextPop
+                else:
+                    newPop.append(guy)
+
+            #generational replacement
+            self.pop = newPop
             
-        #     #update
-        #     #for i in range(len(self.pop)):
-        #         #self.fitness.update({i : self.evaluateFitness(self.pop[i], x, y)})          
-            
-        #     #new sortFit list
-        #     #self.sortFit = sorted(self.fitness.items(), key=lambda x:x[1]) 
-            
-        #     #store current best individual
-        #     #best = self.pop[-1]
-            
-        #     #print(self.sortFit[-1][1])
+            #sort population by fitness
+            self.sortPop = sorted(self.pop, key=lambda j:self.evaluateFitness(j, x, y))
+            self.pop = self.sortPop
+
+            best = [self.pop[-1], self.evaluateFitness(self.pop[-1], x, y)]
+            print ("Current Best at fitness " + str(best[1]))
+
+            #check convergence
+            #converged = self.postIterationProcess(valX, valY)
 
             

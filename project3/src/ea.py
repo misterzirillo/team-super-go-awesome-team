@@ -10,6 +10,7 @@ class EA(ABC):
     
     pop = []
     numWeights =0
+    bestEva=[]
     
     def __init__(self, shape, mu):
         #self.transfer = transfer
