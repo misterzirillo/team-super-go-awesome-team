@@ -38,8 +38,12 @@ class DE(EA):
         dudes.append(xi)
         
         #select the target, the best individual (x1)
-        x1 = best
-        dudes.append(x1)
+        if(xi == best):
+            x1 = self.grabDude(dudes)
+            dudes.append(x1)
+        else:
+            x1 = best
+            dudes.append(x1)
         
         #randomly select two different(x2,x3 !=x1, xi)
         x2 = self.grabDude(dudes)
@@ -91,9 +95,10 @@ class DE(EA):
         self.sortPop = sorted(self.pop, key=lambda j:self.evaluateFitness(j, x, y))
         self.pop = self.sortPop
 
-        print(self.evaluateFitness(self.sortPop[-1],x,y))
-        print(self.evaluateFitness(self.pop[-1],x,y))
-        print(len(self.sortPop))
+        #print(self.evaluateFitness(self.sortPop[-1],x,y))
+        #print(self.evaluateFitness(self.pop[-1],x,y))
+        #print(len(self.sortPop))
+        self.bestEva = [self.pop[-1], self.evaluateFitness(self.pop[-1], x, y)]
         
         ##Loop###
         converged = False
@@ -132,8 +137,11 @@ class DE(EA):
             self.pop = self.sortPop
 
             best = [self.pop[-1], self.evaluateFitness(self.pop[-1], x, y)]
-            print ("Current Best at fitness " + str(best[1]))
-
+            if best[1] > self.bestEva[1]:
+                self.bestEva = best
+                print ("Current Best at fitness " + str(best[1]) + " after " + str(t) +" generations with beta at " + str(self.beta))
+            if t % 30 ==0:
+                self.beta = self.beta +.1
             #check convergence
             #converged = self.postIterationProcess(valX, valY)
 
