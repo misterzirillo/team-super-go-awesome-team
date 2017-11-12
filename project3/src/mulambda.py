@@ -68,7 +68,7 @@ class MuLambda(EA):
 				print ("Current Best at fitness " + str(best[1]) + " after " + str(t) +" generations")
 				print("Training Error: " + str(self.trainingErrors[-1]) + "\tValidation Error: " + str(self.validationErrors[-1]))
 
-			converged = self.postIterationProcess(validationX, validationY, best[1])
+			converged = self.postIterationProcess(validationX, validationY, best[1], t)
 
 
 	def crossOver(self):

@@ -111,14 +111,14 @@ def crossValid(creationFunction, n, x, y, maxGen):
 
 	for i in range(n):
 		#get ya folds
-		helpers.get2Fold(x, y)
+		train, val = get2Fold(x, y)
 		trainX, trainY = zip(*train)
-		trainX = np.array(trainX)
-		trainY = np.array(trainY)
+		trainX = numpy.array(trainX)
+		trainY = numpy.array(trainY)
 
 		valX, valY = zip(*val)
-		valX = np.array(valX)
-		valY = np.array(valY)
+		valX = numpy.array(valX)
+		valY = numpy.array(valY)
 		#build ya pops
 		pops.append(creationFunction()) #
 
@@ -129,11 +129,12 @@ def crossValid(creationFunction, n, x, y, maxGen):
 		allTrainErr.append(pop.trainingErrors)
 		minTrains.append(pop.trainingErrors[-1])
 		allValErr.append(pop.validationErrors)
-		minVals.append(np.min(pop.validationErrors))
+		minVals.append(numpy.min(pop.validationErrors))
+		
 
 	#gather means to REEEEEEEEEEEport
-	avgTrainErr = np.mean(minTrains)
-	avgValErr = np.mean(minVals)
+	avgTrainErr = numpy.mean(minTrains)
+	avgValErr = numpy.mean(minVals)
 
 	return(avgTrainErr, avgValErr, allTrainErr, allValErr)
 
