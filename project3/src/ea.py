@@ -5,11 +5,11 @@ from abc import ABC, abstractmethod
 import collections
 import numpy as np
 from mlpnetwork import MLPNetwork
+import helpers
 
 class EA(ABC):
     
     pop = []
-    numWeights =0
     bestEva=[]
     
     def __init__(self, shape, mu):
@@ -47,9 +47,7 @@ class EA(ABC):
 
         hypothesis = rehydrated.propagate(x)
 
-        corrects = [hi.argmax() == yi.argmax() for hi, yi in zip(hypothesis, y)]
-
-        return (np.sum(corrects) / len(y)) * 100
+        return helpers.percentCorrect(hypothesis, y)
     
     #select the parents from the population
     @abstractmethod

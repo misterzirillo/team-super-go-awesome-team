@@ -151,21 +151,4 @@ class GA(EA):
                     check.append(("no", (i, j)))
             #print(check)
         return(specimens)
-                    
-    #find the slackers and replace them with new dudes
-    def replace(self, newPop, fitNext):
-        for i in range(len(newPop)-1):
-            pass
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
-                
-            
     

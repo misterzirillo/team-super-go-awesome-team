@@ -88,17 +88,9 @@ def rankBasedSelection(pop, sortFit, numParents):
         wheel.append(sum(Pxi))
 
     parents = random.choices(sortFit, cum_weights=wheel, k=numParents)
-
-    ''' while len(parents)< numParents:
-        num = random.uniform(0, max(wheel, key = lambda x: x[0])[0])
-
-        if len(wheel) is not 0:
-            chosenOne = list(takewhile(lambda g: g[0] < num, wheel))[-1]
-        else:
-            print(wheel)
-            raise "More parents than population"
-        
-        parents.append(chosenOne[1])
-        del wheel[wheel.index(chosenOne)]
- '''
     return parents
+
+def percentCorrect(networkOut, actualY):
+    corrects = [hi.argmax() == yi.argmax() for hi, yi in zip(networkOut, actualY)]
+    it = (numpy.sum(corrects) / len(actualY)) * 100
+    return it

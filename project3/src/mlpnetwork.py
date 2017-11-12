@@ -1,9 +1,7 @@
 import argparse
 import math
 from datetime import datetime
-
 import numpy as np
-from helpers import readDatasetFromFile, fileRelativeToHere
 
 
 class MLPNetwork:
@@ -14,7 +12,7 @@ class MLPNetwork:
         #self.transfer = transfer
         self.shape = shape
         self.layers = len(self.shape) - 1
-        self.c = 1
+        self.transfer = transfer
 
         # Data from Feed Forward
         # Need to save for backprop
@@ -52,8 +50,8 @@ class MLPNetwork:
 
         return self.layer_out[-1].T
     
-    def transfer(self, x, output):
-        if not output:
-            return np.tanh(x)
-        else:
-            return self.c * x
+def transfer(x, output):
+    if not output:
+        return np.tanh(x)
+    else:
+        return 1 / (1 + np.exp(-x))
