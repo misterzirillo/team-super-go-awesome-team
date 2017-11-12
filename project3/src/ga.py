@@ -71,7 +71,9 @@ class GA(EA):
 				print("Training Error: " + str(self.trainingErrors[-1]) + "\tValidation Error: " + str(self.validationErrors[-1]))
 			
 			#print(self.sortFit[-1][1])
-			self.postIterationProcess(valX, valY, best[1], t)
+			converged = self.postIterationProcess(valX, valY, best[1], t)
+			if t == maxGen:
+				print("Max generations reached.")
 			
 			
 	

@@ -146,5 +146,6 @@ class DE(EA):
 				self.beta = self.beta +.1
 			#check convergence
 			converged = self.postIterationProcess(valX, valY, best[1], t)
-
+			if t == maxGen:
+				print("Max generations reached.")
 			
