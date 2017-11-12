@@ -98,8 +98,8 @@ class EA(ABC):
 		self.validationErrors.append(validationError)
 		converged = False
 		#converged = self.validationErrors[-1] > self.validationErrors[-2] if len(self.validationErrors) > 10 else False
-		if t > 10:
-			converged = self.validationErrors[-1] > np.mean(self.validationErrors[10:]) + np.std(self.validationErrors[10:])
+		if t > 1:
+			converged = self.validationErrors[-1] > np.mean(self.validationErrors) + np.std(self.validationErrors)
 			if converged:
 				print("Convergence check reached at Generation " + str(t))
 				print(str(self.validationErrors[-1]) + ' > ' + str(np.mean(self.validationErrors)) + str(np.std(self.validationErrors)))
