@@ -143,6 +143,6 @@ class DE(EA):
             if t % 30 ==0:
                 self.beta = self.beta +.1
             #check convergence
-            #converged = self.postIterationProcess(valX, valY)
+            converged = self.postIterationProcess(valX, valY, best[1])
 
             

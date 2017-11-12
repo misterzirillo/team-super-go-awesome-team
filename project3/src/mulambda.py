@@ -57,11 +57,11 @@ class MuLambda(EA):
             self.sortFit = sorted(self.fitness.items(), key=lambda x:x[1]) 
             
             #store current best individual
-            best = self.pop[-1]
+            best = [self.pop[-1], self.evaluateFitness(self.pop[-1], x, y)]
             
             #print(self.sortFit[-1][1])
 
-            converged = self.postIterationProcess(validationX, validationY)
+            converged = self.postIterationProcess(validationX, validationY, best[1])
 
 
     def crossOver(self):
