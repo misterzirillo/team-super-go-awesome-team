@@ -195,3 +195,4 @@ def report(cvResults,algo,dataset,network):
     f.write("Minimum validation error std dev: " + str(numpy.std(minValErrs)))
     f.write("Average generations to convergence: " + str(numpy.mean(convGens)))
     f.write("Generations to convergence std dev: " + str(numpy.std(convGens)))
+    f.close()
