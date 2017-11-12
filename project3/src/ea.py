@@ -10,7 +10,6 @@ import helpers
 class EA(ABC):
 	
 	pop = []
-	numWeights =0
 	bestEva=[]
 	validOne = []
 	
@@ -49,9 +48,7 @@ class EA(ABC):
 
 		hypothesis = rehydrated.propagate(x)
 
-		corrects = [hi.argmax() == yi.argmax() for hi, yi in zip(hypothesis, y)]
-
-		return (np.sum(corrects) / len(y)) * 100
+		return helpers.percentCorrect(hypothesis, y)
 	
 	#select the parents from the population
 	@abstractmethod
