@@ -93,7 +93,7 @@ class EA(ABC):
         trainingError = 100 - fit        
         validationError = 100 - self.evaluateFitness(self.pop[-1], x, y)
 
-        print('training error: ' + str(trainingError) + '\tvalidation error: ' + str(validationError))
+        #print('training error: ' + str(trainingError) + '\tvalidation error: ' + str(validationError))
 
         self.trainingErrors.append(trainingError)
         self.validationErrors.append(validationError)

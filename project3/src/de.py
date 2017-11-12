@@ -137,9 +137,11 @@ class DE(EA):
             self.pop = self.sortPop
 
             best = [self.pop[-1], self.evaluateFitness(self.pop[-1], x, y)]
-            if best[1] > self.bestEva[1]:
+
+            if best[1] > self.bestEva[1] and t > 2:
                 self.bestEva = best
                 print ("Current Best at fitness " + str(best[1]) + " after " + str(t) +" generations with beta at " + str(self.beta))
+                print("Training Error: " + str(self.trainingErrors[-1]) + "\tValidation Error: " + str(self.validationErrors[-1]))
             if t % 30 ==0:
                 self.beta = self.beta +.1
             #check convergence
