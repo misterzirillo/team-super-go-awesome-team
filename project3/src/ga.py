@@ -71,7 +71,7 @@ class GA(EA):
 				print("Training Error: " + str(self.trainingErrors[-1]) + "\tValidation Error: " + str(self.validationErrors[-1]))
 			
 			#print(self.sortFit[-1][1])
-			self.postIterationProcess(valX, valY, best[1])
+			self.postIterationProcess(valX, valY, best[1], t)
 			
 			
 	

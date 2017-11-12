@@ -91,7 +91,7 @@ class EA(ABC):
 			lastIndex = newLastIndex
 		return acc
 
-	def postIterationProcess(self, x, y, fit):
+	def postIterationProcess(self, x, y, fit, t):
 		trainingError = 100 - fit        
 		validationError = 100 - self.evaluateFitness(self.pop[-1], x, y)
 
@@ -99,12 +99,13 @@ class EA(ABC):
 
 		self.trainingErrors.append(trainingError)
 		self.validationErrors.append(validationError)
-
+		converged = False
 		#converged = self.validationErrors[-1] > self.validationErrors[-2] if len(self.validationErrors) > 10 else False
-		converged = self.validationErrors[-1] > np.mean(self.validationErrors) + np.std(self.validationErrors)
+		if t > 50:
+			converged = self.validationErrors[-1] > np.mean(self.validationErrors) + np.std(self.validationErrors)
+			if converged:
+				print("Convergence check reached at Generation " + str(t))
+				print(str(self.validationErrors[-1]) + ' > ' + str(np.mean(self.validationErrors)) + str(np.std(self.validationErrors)))
 
-		if converged:
-			print("Convergence check reached:")
-			print(str(self.validationErrors[-1]) + ' > ' + str(np.mean(self.validationErrors)) + str(np.std(self.validationErrors)))
 		return converged
 
