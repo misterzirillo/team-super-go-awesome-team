@@ -32,7 +32,9 @@ class GA(EA):
         self.sortFit = sorted(self.fitness.items(), key=lambda x:x[1])
         
         #store current best individual
+        self.bestEva = [self.pop[-1], self.evaluateFitness(self.pop[-1], x, y)]
         best = max(self.fitness, key=(lambda key: self.fitness[key]))
+        print ("Starting Best at "+str(best) + " with fitness ", str(self.fitness[best]))
 
         converged = False
         while(t <= maxGen and not converged):
@@ -61,10 +63,15 @@ class GA(EA):
  
             
             #store current best individual
-            best = self.pop[-1]
+            best = [self.pop[-1], self.evaluateFitness(self.pop[-1], x, y)]
+
+            if best[1] > self.bestEva[1] and t > 2:
+                self.bestEva = best
+                print ("Current Best at fitness " + str(best[1]) + " after " + str(t) +" generations")
+                print("Training Error: " + str(self.trainingErrors[-1]) + "\tValidation Error: " + str(self.validationErrors[-1]))
             
             #print(self.sortFit[-1][1])
-            self.postIterationProcess(valX, valY)
+            self.postIterationProcess(valX, valY, best[1])
             
             
     

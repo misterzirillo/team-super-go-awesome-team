@@ -89,7 +89,7 @@ class DE(EA):
         self.sortFit = sorted(self.fitness.items(), key=lambda x:x[1])
         
         best = max(self.fitness, key=(lambda key: self.fitness[key]))
-        print ("Current Best at "+str(best) + " with fitness ", str(self.fitness[best]))
+        print ("Starting Best at "+str(best) + " with fitness ", str(self.fitness[best]))
 
         #sort population by fitness
         self.sortPop = sorted(self.pop, key=lambda j:self.evaluateFitness(j, x, y))
