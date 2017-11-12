@@ -58,10 +58,10 @@ def readPokerData():
 	return readDatasetFromFile('poker-hand-training-true.data', 0, 10, 10) # need shape [10 ... 10]
 
 def readGlassData():
-    return readDatasetFromFile('glass.data', 1, 10, 10) # need shape [9 ... 7]
+	return readDatasetFromFile('glass.data', 1, 10, 10) # need shape [9 ... 7]
 
 def readWineData():
-    return readDatasetFromFile('wine.data', 1, 14, 0) # need shape [13 ... 3]
+	return readDatasetFromFile('wine.data', 1, 14, 0) # need shape [13 ... 3]
 
 # CV helpers
 def get2Fold(x, y):
@@ -93,13 +93,13 @@ def rankBasedSelection(pop, sortFit, numParents):
 		Pxi.append((lam2 + (i/(n-1)) * (lam1 - lam2)) / n)
 		wheel.append(sum(Pxi))
 
-    parents = random.choices(sortFit, cum_weights=wheel, k=numParents)
-    return parents
+	parents = random.choices(sortFit, cum_weights=wheel, k=numParents)
+	return parents
 
 def percentCorrect(networkOut, actualY):
-    corrects = [hi.argmax() == yi.argmax() for hi, yi in zip(networkOut, actualY)]
-    it = (numpy.sum(corrects) / len(actualY)) * 100
-    return it
+	corrects = [hi.argmax() == yi.argmax() for hi, yi in zip(networkOut, actualY)]
+	it = (numpy.sum(corrects) / len(actualY)) * 100
+	return it
 
 def crossValid(creationFunction, n, x, y, maxGen):
 	#create n instances of 2 fold cross validation

@@ -8,11 +8,11 @@ class MLPNetwork:
 
 	def __init__(self, shape):
 
-        # Network Basic Properties
-        #self.transfer = transfer
-        self.shape = shape
-        self.layers = len(self.shape) - 1
-        self.transfer = transfer
+		# Network Basic Properties
+		#self.transfer = transfer
+		self.shape = shape
+		self.layers = len(self.shape) - 1
+		self.transfer = transfer
 
 		# Data from Feed Forward
 		# Need to save for backprop
@@ -48,10 +48,10 @@ class MLPNetwork:
 			self.layer_in.append(layer_in)
 			self.layer_out.append(self.transfer(layer_in, i == self.layers - 1))
 
-        return self.layer_out[-1].T
-    
+		return self.layer_out[-1].T
+	
 def transfer(x, output):
-    if not output:
-        return np.tanh(x)
-    else:
-        return 1 / (1 + np.exp(-x))
+	if not output:
+		return np.tanh(x)
+	else:
+		return 1 / (1 + np.exp(-x))

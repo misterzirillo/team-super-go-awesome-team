@@ -136,19 +136,19 @@ class GA(EA):
 	# should return a whole new copy of the population
 	# example: self.pop = self.mutate()
 
-    def mutate(self, specimens):
-        super().mutate()
-        #probability of mutation on a feature
-        Pm =.1
-        check = []
-        for i in range(len(specimens)):
-            for j in range(len(specimens[i])):
-                num = random.random()
-                if(num < Pm):
-                    specimens[i][j] = random.normalvariate(specimens[i][j], 1)
-                    check.append(("yes", (i, j)))
-                else:
-                    check.append(("no", (i, j)))
-            #print(check)
-        return(specimens)
-    
+	def mutate(self, specimens):
+		super().mutate()
+		#probability of mutation on a feature
+		Pm =.1
+		check = []
+		for i in range(len(specimens)):
+			for j in range(len(specimens[i])):
+				num = random.random()
+				if(num < Pm):
+					specimens[i][j] = random.normalvariate(specimens[i][j], 1)
+					check.append(("yes", (i, j)))
+				else:
+					check.append(("no", (i, j)))
+			#print(check)
+		return(specimens)
+	

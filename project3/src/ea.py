@@ -24,7 +24,6 @@ class EA(ABC):
 	def train(self):
 		self.trainingErrors = []
 		self.validationErrors =[]
-	numWeights =0
 
 	#display structure stats
 	def check(self):
@@ -49,12 +48,12 @@ class EA(ABC):
 
 		hypothesis = rehydrated.propagate(x)
 
-        return helpers.percentCorrect(hypothesis, y)
-    
-    #select the parents from the population
-    @abstractmethod
-    def selectFrom(self):
-        pass
+		return helpers.percentCorrect(hypothesis, y)
+	
+	#select the parents from the population
+	@abstractmethod
+	def selectFrom(self):
+		pass
 
 	#generate offspring according to the crossover rate
 	#global, uniform
