@@ -147,6 +147,7 @@ def report(cvResults,algo,dataset,params):
     chartTitle = ''
     print(algo)
     print(dataset)
+    plt.clf()
     if (algo in ['ga','ml','de','bp']) and (dataset in ['zoo','leaf','poker','wine','glass']):
         chartTitle = dataset + ', ' + algo + ' Shape ' + str(params[0]) + ', Mu ' + str(params[1])
         if algo == 'ga':
@@ -162,7 +163,7 @@ def report(cvResults,algo,dataset,params):
             convGens.append(numpy.argmin(cvResults[3][i]))
             minValErrs.append(cvResults[3][i][convGens[i]])
             plt.plot(range(len(cvResults[2][i])),cvResults[2][i], color='red',label="Train")
-            plt.plot(range(len(cvResults[3][i])),cvResults[3][i],color='blue',label="Validation")
+            plt.plot(range(len(cvResults[3][i])),cvResults[3][i], color='blue',label="Validation")
             plt.legend()
             plt.ylabel('% Error')
             plt.xlabel('Generations')
@@ -172,8 +173,7 @@ def report(cvResults,algo,dataset,params):
             plt.clf()
     else:
         print('algo or dataset invalid')
-        return
-    
+        return    
 
     for i in range(len(cvResults[2])):
         c = [float(i+10)/float(15), 0.0, 0.0] #R,G,B
@@ -183,23 +183,23 @@ def report(cvResults,algo,dataset,params):
         plt.annotate('*',xy=(convGens[i],minValErrs[i]))
 
     #print(numpy.average(cvResults[2], axis = 0))
+    
+    #plt.plot(range(len(cvResults[2][0])), numpy.average(cvResults[2], axis = 0),color='red')
+    #plt.plot(range(len(cvResults[2][0])), numpy.average(cvResults[3], axis = 0),color='blue')
 
-    plt.plot(range(len(cvResults[2][i])),numpy.average(cvResults[2], axis = 0),color='red')
-    plt.plot(range(len(cvResults[2][i])),numpy.average(cvResults[3], axis = 0),color='blue')
+    #plt.ylabel('% Error')
+    #plt.xlabel('Generations')
+    #plt.title(chartTitle)
+    #plt.savefig(chartTitle+'.pdf',dpi=900)
+    #plt.clf()
 
-    plt.ylabel('% Error')
-    plt.xlabel('Generations')
-    plt.title(chartTitle)
-    plt.savefig(chartTitle+'.pdf',dpi=900)
-    plt.clf()
+    #plt.plot(range(len(cvResults[2][i])),numpy.average(cvResults[2], axis = 0),color='red')
+    #plt.plot(range(len(cvResults[2][i])),numpy.average(cvResults[3], axis = 0),color='blue')
 
-    plt.plot(range(len(cvResults[2][i])),numpy.average(cvResults[2], axis = 0),color='red')
-    plt.plot(range(len(cvResults[2][i])),numpy.average(cvResults[3], axis = 0),color='blue')
-
-    plt.ylabel('% Error')
-    plt.xlabel('Generations')
-    plt.title(chartTitle)
-    plt.savefig('avg'+ chartTitle +'.pdf',dpi=900)
+    #plt.ylabel('% Error')
+    #plt.xlabel('Generations')
+    #plt.title(chartTitle)
+    #plt.savefig('avg'+ chartTitle +'.pdf',dpi=900)
     plt.clf()
     f = open(chartTitle + ".txt","w+")
     f.write("Average minimum training error: " + str(cvResults[0]) + "\n")
