@@ -3,6 +3,7 @@ import inspect
 import numpy
 from itertools import takewhile
 import random
+import matplotlib.pyplot as plt
 
 # helper to write files with relative locations
 thisFileLocation = os.path.dirname(inspect.stack()[0][1])
@@ -138,3 +139,72 @@ def crossValid(creationFunction, n, x, y, maxGen):
 
 	return(avgTrainErr, avgValErr, allTrainErr, allValErr)
 
+
+#cvResults=output of cross validation, algo=(str)current Algorithm, dataset=(str)current dataset, params=network params
+def report(cvResults,algo,dataset,params):
+    convGens = []
+    minValErrs = []
+    chartTitle = ''
+    print(algo)
+    print(dataset)
+    if (algo in ['ga','ml','de','bp']) and (dataset in ['zoo','leaf','poker','wine','glass']):
+        chartTitle = dataset + ', ' + algo + ' Shape ' + str(params[0]) + ', Mu ' + str(params[1])
+        if algo == 'ga':
+            pass
+        elif algo == 'ml':
+            chartTitle = chartTitle + ', Lambda ' + str(params[2]) + ', Starting Sigma ' + str(params[3]) + ', Alpha ' + str(params[4])
+        elif algo == 'de':
+            chartTitle = chartTitle + ', Beta ' + str(params[2]) + ', Prob Recombination ' + str(params[3])
+        elif algo == 'bp':
+            chartTitle = chartTitle + ', ' + str(params[2])
+        
+        for i in range(len(cvResults[2])):
+            convGens.append(numpy.argmin(cvResults[3][i]))
+            minValErrs.append(cvResults[3][i][convGens[i]])
+            plt.plot(range(len(cvResults[2][i])),cvResults[2][i], color='red',label="Train")
+            plt.plot(range(len(cvResults[3][i])),cvResults[3][i],color='blue',label="Validation")
+            plt.legend()
+            plt.ylabel('% Error')
+            plt.xlabel('Generations')
+            plt.title(str(i) + chartTitle)
+            plt.annotate('*',xy=(convGens[i],minValErrs[i]))
+            plt.savefig(str(i) + chartTitle+'.pdf',dpi=720)
+            plt.clf()
+    else:
+        print('algo or dataset invalid')
+        return
+    
+
+    for i in range(len(cvResults[2])):
+        c = [float(i+10)/float(15), 0.0, 0.0] #R,G,B
+        plt.plot(range(len(cvResults[2][i])),cvResults[2][i], color=c)
+        c = [0.0, 0.0, float(i+10)/float(15)] #R,G,B
+        plt.plot(range(len(cvResults[3][i])),cvResults[3][i],color=c)
+        plt.annotate('*',xy=(convGens[i],minValErrs[i]))
+
+    #print(numpy.average(cvResults[2], axis = 0))
+
+    plt.plot(range(len(cvResults[2][i])),numpy.average(cvResults[2], axis = 0),color='red')
+    plt.plot(range(len(cvResults[2][i])),numpy.average(cvResults[3], axis = 0),color='blue')
+
+    plt.ylabel('% Error')
+    plt.xlabel('Generations')
+    plt.title(chartTitle)
+    plt.savefig(chartTitle+'.pdf',dpi=900)
+    plt.clf()
+
+    plt.plot(range(len(cvResults[2][i])),numpy.average(cvResults[2], axis = 0),color='red')
+    plt.plot(range(len(cvResults[2][i])),numpy.average(cvResults[3], axis = 0),color='blue')
+
+    plt.ylabel('% Error')
+    plt.xlabel('Generations')
+    plt.title(chartTitle)
+    plt.savefig('avg'+ chartTitle +'.pdf',dpi=900)
+    plt.clf()
+    f = open(chartTitle + ".txt","w+")
+    f.write("Average minimum training error: " + str(cvResults[0]) + "\n")
+    f.write("Average Minimum Validation Error" + str(cvResults[1]) + "\n")
+    f.write("Minimum validation error std dev: " + str(numpy.std(minValErrs)) + "\n")
+    f.write("Average generations to convergence: " + str(numpy.mean(convGens)) + "\n")
+    f.write("Generations to convergence std dev: " + str(numpy.std(convGens)))
+    f.close()
