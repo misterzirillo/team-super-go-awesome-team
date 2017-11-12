@@ -13,39 +13,23 @@ class Backpropagation(object):
 
 	# same as propagate, but then backpropagates the
 	# error using gradient descent
-	def backpropagate(self, x, y, timelimit_minutes = 60, convergence_threshold = 99, max_epoch = 100000, learning_rate = 0.01, momentum = 0.5):
+	def train(self, x, y, validationX, validationY, maxGen = 100000, learning_rate = 0.01, momentum = 0.5):
+
+		self.trainingErrors = []
+		self.validationErrors = []
 		
 		printcount = 0
-		batch_mse = []
 		epoch = 0
 		start = datetime.now()
-
-		def time_ok():
-			if (datetime.now() - start).total_seconds() / 60  > timelimit_minutes:
-				print('Backpropogation aborted - time limit reached')
-				return False
-			else:
-				return True
-
-		def converged():
-			converged = len(batch_mse) > 100 and batch_mse[-1] > convergence_threshold
-			if converged:
-				print('Backpropogation successful - convergence threshold reached')
-			return converged
-
-		def diverged():
-			diverged = len(batch_mse) > 100 and math.isnan(batch_mse[-1])
-			if diverged:
-				print('Backpropagation aborted - diverged')
-			return diverged
+		converged = False
 
 		def epochs_exceeded():
-			exceeded = epoch > max_epoch
+			exceeded = epoch > maxGen
 			if (exceeded):
 				print('Backpropagation aborted - max epochs exceeded')       
 			return exceeded
 
-		while not converged() and time_ok() and not diverged() and not epochs_exceeded():
+		while not converged and not epochs_exceeded():
 
 			delta = []
 			batch_examples = x.shape[0]
@@ -81,13 +65,30 @@ class Backpropagation(object):
 
 				self.network.previous_delta[i] = weight_delta
 
-			batch_mse.append(error)
 			printcount += batch_examples
+			valSuccess = helpers.percentCorrect(self.network.propagate(validationX), validationY)
 			if printcount > 10000:
-				s = 'epoch\t{}\tpercent correct\t{}'.format(epoch, error)
+				s = 'epoch\t{}training percent correct\t{}\tvalidation percent correct\t{}'.format(epoch, error,valSuccess)
 				print(s)
 				printcount = 0
 
 			epoch += 1
+			converged = self.postIterationProcess(validationX, validationY, error, epoch, valSuccess)
 
-		return batch_mse
+	def postIterationProcess(self, x, y, fit, t, valSuccess):
+		trainingError = 100 - fit
+		validationError = 100 - valSuccess
+
+		#print('training error: ' + str(trainingError) + '\tvalidation error: ' + str(validationError))
+
+		self.trainingErrors.append(trainingError)
+		self.validationErrors.append(validationError)
+		converged = False
+		#converged = self.validationErrors[-1] > self.validationErrors[-2] if len(self.validationErrors) > 10 else False
+		if t > 10:
+			converged = self.validationErrors[-1] > np.mean(self.validationErrors) + np.std(self.validationErrors)
+			if converged:
+				print("Convergence check reached at Generation " + str(t))
+				print(str(self.validationErrors[-1]) + ' > ' + str(np.mean(self.validationErrors)) + str(np.std(self.validationErrors)))
+
+		return converged
