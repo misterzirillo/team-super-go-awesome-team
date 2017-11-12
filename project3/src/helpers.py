@@ -57,6 +57,12 @@ def readLeafData():
 def readPokerData():
     return readDatasetFromFile('poker-hand-training-true.data', 0, 10, 10) # need shape [10 ... 10]
 
+def readGlassData():
+    return readDatasetFromFile('glass.data', 1, 10, 10) # need shape [9 ... 7]
+
+def readWineData():
+    return readDatasetFromFile('wine.data', 1, 14, 0) # need shape [13 ... 3]
+
 # CV helpers
 def get2Fold(x, y):
     zipped = list(zip(x,y))
