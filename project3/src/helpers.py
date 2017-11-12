@@ -52,7 +52,7 @@ def readZooData():
 	return readDatasetFromFile('zoo.data', 1, 17, -1) # need shape [16 .. 7]
 
 def readLeafData():
-	return readDatasetFromFile('leaf.csv', 2, 16, 0) # need shape [14 ... 36]
+	return readDatasetFromFile('leaf.csv', 2, 16, 0) # need shape [14 ... 30]
 
 def readPokerData():
 	return readDatasetFromFile('poker-hand-training-true.data', 0, 10, 10) # need shape [10 ... 10]
