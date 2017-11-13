@@ -76,6 +76,8 @@ def get_mini_batches(dataset, batch_size):
 	mini_batches = [X_shuffled[i:i+batch_size] for i in range(0, len(dataset), batch_size)]
 	return mini_batches
 
+# performs a roullette style selection where the fittest individual is most likely
+# to be selected
 def rankBasedSelection(pop, sortFit, numParents):
 	parents = []
 	n = len(pop)
@@ -97,11 +99,14 @@ def rankBasedSelection(pop, sortFit, numParents):
 	parents = random.choices(sortFit, cum_weights=wheel, k=numParents)
 	return parents
 
+# determine percent correct given network output vector and answer vector
 def percentCorrect(networkOut, actualY):
 	corrects = [hi.argmax() == yi.argmax() for hi, yi in zip(networkOut, actualY)]
 	it = (numpy.sum(corrects) / len(actualY)) * 100
 	return it
 
+# helper to create N folds given a dataset and train an algorithm on each, using
+# the other as the validation set AKA N by 2 cross validation.
 def crossValid(creationFunction, n, x, y, maxGen):
 	#create n instances of 2 fold cross validation
 	pops=[]
@@ -139,7 +144,7 @@ def crossValid(creationFunction, n, x, y, maxGen):
 
 	return(avgTrainErr, avgValErr, allTrainErr, allValErr)
 
-
+# generates a txt file and plots to summarize the output of crossValid
 #cvResults=output of cross validation, algo=(str)current Algorithm, dataset=(str)current dataset, params=network params
 def report(cvResults,algo,dataset,params):
     convGens = []
@@ -153,11 +158,11 @@ def report(cvResults,algo,dataset,params):
         if algo == 'ga':
             pass
         elif algo == 'ml':
-            chartTitle = chartTitle + ', Lambda ' + str(params[2]) + ', Starting Sigma ' + str(params[3]) + ', Alpha ' + str(params[4])
+            chartTitle = chartTitle + ', Lambda ' + str(params[2]) + ', Starting Sigma ' + str(params[3]) + ', Alpha ' + str(params[4]) 
         elif algo == 'de':
-            chartTitle = chartTitle + ', Beta ' + str(params[2]) + ', Prob Recombination ' + str(params[3])
+            chartTitle = chartTitle + ', Beta ' + str(params[2]) + ', Prob Recombination ' + str(params[3]) + ', Mu ' + str(params[1])
         elif algo == 'bp':
-            chartTitle = chartTitle + ', ' + str(params[2])
+            chartTitle = chartTitle + ', learning rate' + str(params[0	])
         
         for i in range(len(cvResults[2])):
             convGens.append(numpy.argmin(cvResults[3][i]))

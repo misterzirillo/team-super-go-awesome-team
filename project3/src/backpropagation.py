@@ -6,14 +6,16 @@ import helpers
 
 class Backpropagation(object):
 
-	def __init__(self, shape):
+	def __init__(self, shape, learning_rate = 0.01, momentum = 0.5):
 		self.network = MLPNetwork(shape)
 		self.shape = self.network.shape
 		self.transfer_derivative = lambda x, isOutput: x * (1 - x) if isOutput else np.cosh(x) ** -2
+		self.learning_rate = learning_rate
+		self.momentum = momentum
 
 	# same as propagate, but then backpropagates the
 	# error using gradient descent
-	def train(self, x, y, validationX, validationY, maxGen = 100000, learning_rate = 0.01, momentum = 0.5):
+	def train(self, x, y, validationX, validationY, maxEpoch):
 
 		self.trainingErrors = []
 		self.validationErrors = []
@@ -24,7 +26,7 @@ class Backpropagation(object):
 		converged = False
 
 		def epochs_exceeded():
-			exceeded = epoch > maxGen
+			exceeded = epoch > maxEpoch
 			if (exceeded):
 				print('Backpropagation aborted - max epochs exceeded')       
 			return exceeded
@@ -59,7 +61,7 @@ class Backpropagation(object):
 					layer_out[None, :, :].transpose(2, 0, 1) * \
 					delta[delta_i][None, :, :].transpose(2, 1, 0), axis=0)
 
-				weight_delta = learning_rate * cur_weight_delta + momentum * self.network.previous_delta[i]
+				weight_delta = self.learning_rate * cur_weight_delta + self.momentum * self.network.previous_delta[i]
 
 				self.network.weights[i] -= weight_delta
 
@@ -68,13 +70,15 @@ class Backpropagation(object):
 			printcount += batch_examples
 			valSuccess = helpers.percentCorrect(self.network.propagate(validationX), validationY)
 			if printcount > 10000:
-				s = 'epoch\t{}training percent correct\t{}\tvalidation percent correct\t{}'.format(epoch, error,valSuccess)
+				s = 'epoch {}\ttraining percent correct {}\tvalidation percent correct {}'.format(epoch, error,valSuccess)
 				print(s)
 				printcount = 0
 
 			epoch += 1
 			converged = self.postIterationProcess(validationX, validationY, error, epoch, valSuccess)
 
+	# test against the validation set and record results
+	# perform convergence check
 	def postIterationProcess(self, x, y, fit, t, valSuccess):
 		trainingError = 100 - fit
 		validationError = 100 - valSuccess
@@ -85,7 +89,7 @@ class Backpropagation(object):
 		self.validationErrors.append(validationError)
 		converged = False
 		#converged = self.validationErrors[-1] > self.validationErrors[-2] if len(self.validationErrors) > 10 else False
-		if t > 10:
+		if t > 100:
 			converged = self.validationErrors[-1] > np.mean(self.validationErrors) + np.std(self.validationErrors)
 			if converged:
 				print("Convergence check reached at Generation " + str(t))

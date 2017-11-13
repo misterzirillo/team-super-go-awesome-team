@@ -1,4 +1,3 @@
-Matt Cirillo - RBF, grid-centers
-Henry King - RBF, paper, logistics
-Jake Dancyzk - MLP, RBF
-Justin Braun - MLP
+Matt - Design, adapt NN for classification, coding EAs, testing backprop/MuLambda, paper writing
+Jake - Design, coding EAs, reporting/plotting code, testing GA, paper writing
+Henry - Design, coding EAs, automate tuning, testing DE, paper writing

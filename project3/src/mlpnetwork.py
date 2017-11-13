@@ -52,6 +52,6 @@ class MLPNetwork:
 	
 def transfer(x, output):
 	if not output:
-		return np.tanh(x)
+		return np.tanh(x) # hidden layers will use hyperbolic tangent
 	else:
-		return 1 / (1 + np.exp(-x))
+		return 1 / (1 + np.exp(-x)) # output layer should squash to [0, 1]
