@@ -42,7 +42,7 @@ class kmeans():
         dst = {}
         #calculate the distance from the data point to each centroid
         for c in self.C:
-            c_dst = np.linalg.norm(x-c)
+            c_dst = np.linalg.norm(x,c)
             dst.update({c:c_dst}) 
         
         #find min distance
