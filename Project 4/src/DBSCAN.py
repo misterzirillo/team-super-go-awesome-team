@@ -49,6 +49,7 @@ class DBSCAN():
                         if len(neighbors) >= self.min_pts:
                             seed.append(neighbors)
                             new_neighbors = True
+        return(self.labels)
        
     #scans the data and finds the neighbors of a point
     def range_query(self,p):
