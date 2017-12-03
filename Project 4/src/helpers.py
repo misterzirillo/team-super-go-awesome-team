@@ -2,9 +2,6 @@
 '''
 import numpy as np
 import random
-    
-def read_data():
-    pass
 
 def fmeasure():
     pass
@@ -17,3 +14,33 @@ def report():
 
 def crossVal():
     pass
+
+
+# parse in a dataset from the data folder by name
+# argStart index is where to start slicing a line to capture all args
+# argEnd index is were to stop slicing args
+# class is the index where the class label is located
+# example for zoo dataset
+# x, y = helpers.readDatasetFromFile('zoo.data', 1, -1, -1)
+# zoo dataset has a non-feature in the first position so start looking at 
+# index 1. features continue until the last index, which is the class label
+# output is a tuple (x, y) where x is a matrix of input vectors, y is a matrix of output vectors
+def read_data(filename, argStartIndex, argEndIndex, classIndex):
+	outs = {}
+	with open('../data/' + filename, 'r') as f:
+		for line in f:
+			linearr = line.split(',')
+			attrs = numpy.fromiter(map(float, linearr[argStartIndex : argEndIndex]), numpy.float64)
+			label = linearr[classIndex]
+
+            outs[attrs] = (label, None) # label should always be index 0 in tuple, cluster next
+    return outs
+
+def readGlassData():
+	return readDatasetFromFile('glass.data', 1, 10, 10) # need shape [9 ... 7]
+
+def readWineData():
+	return readDatasetFromFile('wine.data', 1, 14, 0) # need shape [13 ... 3]
+
+def readLeafData():
+	return readDatasetFromFile('leaf.csv', 2, 16, 0) # need shape [14 ... 30]
