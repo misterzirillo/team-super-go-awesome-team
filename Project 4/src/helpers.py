@@ -55,3 +55,7 @@ def readLeafData():
 
 def distance(a, b):
     return np.linalg.norm(a - b)
+
+# if you need the inputs as an np matrix use this
+def get_input_matrix_from_dict(read_data_output):
+    return np.vstack(map(np.array, read_data_output.keys()))
