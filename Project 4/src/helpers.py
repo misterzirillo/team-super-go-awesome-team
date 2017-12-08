@@ -3,14 +3,18 @@
 import numpy as np
 import random
 
+
 def fmeasure():
     pass
+
 
 def norm_mutual_info():
     pass
 
+
 def report():
     pass
+
 
 def crossVal():
     pass
@@ -26,21 +30,32 @@ def crossVal():
 # index 1. features continue until the last index, which is the class label
 # output is a tuple (x, y) where x is a matrix of input vectors, y is a matrix of output vectors
 def read_data(filename, argStartIndex, argEndIndex, classIndex):
-	outs = {}
-	with open('../data/' + filename, 'r') as f:
-		for line in f:
-			linearr = line.split(',')
-			attrs = numpy.fromiter(map(float, linearr[argStartIndex : argEndIndex]), numpy.float64)
-			label = linearr[classIndex]
+    outs = {}
+    with open('../data/' + filename, 'r') as f:
+        for line in f:
+            linearr = line.split(',')
+            attrs = tuple(map(float, linearr[argStartIndex: argEndIndex]))
+            label = linearr[classIndex]
 
-            outs[attrs] = (label, None) # label should always be index 0 in tuple, cluster next
+            outs[attrs] = (label, None)  # label should always be index 0 in tuple, cluster next
     return outs
 
+
 def readGlassData():
-	return readDatasetFromFile('glass.data', 1, 10, 10) # need shape [9 ... 7]
+    return read_data('glass.data', 1, 10, 10)  # need shape [9 ... 7]
+
 
 def readWineData():
-	return readDatasetFromFile('wine.data', 1, 14, 0) # need shape [13 ... 3]
+    return read_data('wine.data', 1, 14, 0)  # need shape [13 ... 3]
+
 
 def readLeafData():
-	return readDatasetFromFile('leaf.csv', 2, 16, 0) # need shape [14 ... 30]
+    return read_data('leaf.csv', 2, 16, 0)  # need shape [14 ... 30]
+
+
+def distance(a, b):
+    return np.linalg.norm(a - b)
+
+# if you need the inputs as an np matrix use this
+def get_input_matrix_from_dict(read_data_output):
+    return np.vstack(map(np.array, read_data_output.keys()))
