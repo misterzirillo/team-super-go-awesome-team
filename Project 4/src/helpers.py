@@ -34,7 +34,7 @@ def read_data(filename, argStartIndex, argEndIndex, classIndex):
     with open('../data/' + filename, 'r') as f:
         for line in f:
             linearr = line.split(',')
-            attrs = np.fromiter(map(float, linearr[argStartIndex: argEndIndex]), np.float64)
+            attrs = tuple(map(float, linearr[argStartIndex: argEndIndex]))
             label = linearr[classIndex]
 
             outs[attrs] = (label, None)  # label should always be index 0 in tuple, cluster next
