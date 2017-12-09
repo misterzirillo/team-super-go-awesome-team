@@ -5,12 +5,33 @@ import random
 import re
 
 
-def fmeasure():
-    pass
+def cohesion(cluster_dict):
+    # we're not scientists so just return mean cohesion for each cluster
+    clust_means = []
+    for k, v in cluster_dict:
+        if k is not 'Noise':
+            points = v
+            dists = []
+            for p1 in points:
+                for p2 in points:
+                    if p1 is not p2:
+                        dists.append(np.linalg.norm(p1 - p2))
+
+            clust_means.append(np.mean(dists))
+
+    return np.mean(clust_means)
 
 
-def norm_mutual_info():
-    pass
+def separation(cluster_dict):
+    dists = []
+    for key in cluster_dict.keys():
+        if key is not 'Noise':
+            mean_point = np.mean(cluster_dict[key], axis=0)
+            for key2 in cluster_dict.keys():
+                if key2 is not 'Noise' and key is not key2:
+                    mean_point2 = np.mean(cluster_dict[key2], axis=0)
+                    dists.append(distance(mean_point, mean_point2))
+    return np.mean(dists)
 
 
 def report():

@@ -1,7 +1,7 @@
 '''DBSCAN clustering
 '''
 import numpy as np
-import random
+import helpers
 
 class DBSCAN():
     
@@ -65,7 +65,7 @@ class DBSCAN():
                             seed.append(neighbors)
                             new_neighbors = True
                             
-        return self.labels, self.keys
+        return self.output()
        
     #scans the data and finds the neighbors of a point
     def range_query(self,p):
@@ -83,6 +83,14 @@ class DBSCAN():
     
     
     def output(self):
-        print("Wow look at all these clusters\n" + str(key in self.labels))
-        pass
+        cluster_dict = {}
+        for label in set(self.labels.values()):
+            guys = []
+            for k, v in self.labels:
+                if v is label:
+                    guys.append(self.keys[k])
+
+            cluster_dict[label] = guys
+
+        return cluster_dict, helpers.separation(cluster_dict), helpers.cohesion(cluster_dict)
     
