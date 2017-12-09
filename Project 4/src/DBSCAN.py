@@ -89,11 +89,11 @@ class DBSCAN():
         cluster_dict = {}
         for label in set(self.labels.values()):
             guys = []
-            for k, v in self.labels:
+            for k, v in self.labels.items():
                 if v is label:
                     guys.append(self.keys[k])
 
             cluster_dict[label] = guys
 
-        return cluster_dict, helpers.separation(cluster_dict), helpers.cohesion(cluster_dict)
+        return cluster_dict#, helpers.separation(cluster_dict), helpers.cohesion(cluster_dict)
     

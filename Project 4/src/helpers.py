@@ -10,7 +10,7 @@ from sklearn.neighbors import NearestNeighbors
 def cohesion(cluster_dict):
     # we're not scientists so just return mean cohesion for each cluster
     clust_means = []
-    for k, v in cluster_dict:
+    for k, v in cluster_dict.items():
         if k is not 'Noise':
             points = v
             dists = []
@@ -33,7 +33,8 @@ def separation(cluster_dict):
                 if key2 is not 'Noise' and key is not key2:
                     mean_point2 = np.mean(cluster_dict[key2], axis=0)
                     dists.append(distance(mean_point, mean_point2))
-    return np.mean(dists)
+
+    return np.mean(dists) if len(dists) > 0 else 0
 
 
 def report():
