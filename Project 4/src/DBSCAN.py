@@ -42,27 +42,29 @@ class DBSCAN():
             
             C =+1
             #give p label
+            print("Point added to cluster ,",C)
             self.labels.update({p:C})
             seed = neighbors
-            new_neighbors = False
-            while(new_neighbors==False):
-                
+            new_neighbors = True
+            while(new_neighbors==True):
+                new_neighbors = False
                 for Q in seed:
                     print("Neighbor ", Q, " out of ", len(seed))
                     #if the point was previously noise, give it the label of the current point
                     if self.labels.get(Q) == 'Noise':
-                        print("Noise")
+                        print("Was noise, now member of cluster")
                         self.labels.update({Q:C})
-                    #if the point was 
-                    elif self.labels.get(Q) == None:
-                        print("None")
+                    #if the point was previously processed
+                    elif self.labels.get(Q) is not None:
+                        print("Previously labeled ,", self.labels.get(Q))
                         continue
                     else:
-                        print("Other")
+                        print("Is now member of cluster ", C )
                         self.labels.update({Q:C})
                         neighbors = self.range_query(Q)
+                        #density check
                         if len(neighbors) >= self.min_pts:
-                            seed.append(neighbors)
+                            seed = [x for x in set(seed + neighbors)]
                             new_neighbors = True
                             
         return self.output()
@@ -76,9 +78,10 @@ class DBSCAN():
                 p_V = self.keys.get(p)
                 #if the point is within epsilon from current point
                 if np.linalg.norm(p_V-x_V) <= self.eps:
-                    print("Found Neighbor")
+                    
                     #add it to the neighbors list
                     neighbors.append(x)
+        print("Found",len(neighbors), " neighbors")
         return neighbors
     
     

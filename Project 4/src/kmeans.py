@@ -85,6 +85,7 @@ class kmeans():
             #get members of cluster
             clust_list = self.C.get(c)
             clust = np.array(clust_list)
+            
             #find new center
             ci = np.mean(clust, axis = 0)
 

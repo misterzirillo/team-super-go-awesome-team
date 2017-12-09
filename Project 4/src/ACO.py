@@ -106,7 +106,7 @@ class Aco():
     #equation 17.47 in engelbrecht
     def drop_rate(self, item):
         dens = self.local_density(item)
-        if dens < gamma2
+        if dens < gamma2:
             drop = 2*dens
         else:
             drop = 1
