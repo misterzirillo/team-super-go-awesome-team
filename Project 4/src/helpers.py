@@ -2,6 +2,7 @@
 '''
 import numpy as np
 import random
+import re
 
 
 def fmeasure():
@@ -18,7 +19,6 @@ def report():
 
 def crossVal():
     pass
-
 
 # parse in a dataset from the data folder by name
 # argStart index is where to start slicing a line to capture all args
@@ -59,3 +59,17 @@ def distance(a, b):
 # if you need the inputs as an np matrix use this
 def get_input_matrix_from_dict(read_data_output):
     return np.vstack(map(np.array, read_data_output.keys()))
+
+#moving from dictionary key to list of floats       
+def str_to_float(lst):
+    x_L=re.findall(r"[-+]?\d*\.\d+|\d+", lst)
+    x_floats= [float(i) for i in x_L]
+    return x_floats
+
+#moving from float to string to use as key in dictionary
+def float_to_str(lst):
+    x=''
+    for i in lst:
+        x += (repr(i))
+    return x
+    
