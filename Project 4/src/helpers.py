@@ -3,6 +3,8 @@
 import numpy as np
 import random
 import re
+import matplotlib.pyplot as plt
+from sklearn.neighbors import NearestNeighbors
 
 
 def fmeasure():
@@ -72,4 +74,17 @@ def float_to_str(lst):
     for i in lst:
         x += (repr(i))
     return x
+
+#using knn to educate the tuning process for min_pts and eps in DBSCAN
+#para x is the result of get_input_matrix_from_dict()
+def knn_plot(x):
+    means =[]
+    #for all possible k, run knn
+    for i in range(1,len(x)):
+        neigh = NearestNeighbors(n_neighbors=i).fit(x)
+        distances, indices = neigh.kneighbors(x)
+        means.append(distances.mean())
+    #plot the mean distance between points at each k value  
+    plt.plot(means)
+    plt.show()
     
