@@ -76,6 +76,14 @@ def readLeafData():
     return read_data('leaf.csv', 2, 16, 0)  # need shape [14 ... 30]
 
 
+def read_some_other_data():
+    pass
+
+
+def read_iris_data():
+    return read_data('iris.data', 0, 5, 5)
+
+
 def distance(a, b):
     return np.linalg.norm(a - b)
 
