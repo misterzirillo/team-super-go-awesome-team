@@ -22,9 +22,9 @@ def cohesion(cluster_dict):
                     if p1 is not p2:
                         dists.append(np.linalg.norm(p1 - p2))
 
-            clust_means.append(np.mean(dists))
+            clust_means.append(np.mean(dists) if len(dists) > 0 else 0)
 
-    return np.mean(clust_means)
+    return np.mean(clust_means) if len(clust_means) > 0 else 0
 
 
 # calculates separation of the clustered data
@@ -88,7 +88,7 @@ def readSeedsData():
 
 
 def readIrisData():
-    return read_data('iris.data', 0, 5, 5)
+    return read_data('iris.data', 0, 4, 4)
 
 
 def distance(a, b):
