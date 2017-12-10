@@ -106,7 +106,7 @@ class PSO():
                     self.lbests[i] = [fitness, self.agents[agent][0]]
                     if fitness < self.gbest[0]:
                         print('new gbest')
-                        self.gbest = [fitness, self.agents[agent][0]]
+                        self.gbest = [fitness, self.agents[agent][0], self.agents[agent][1]]
                 #update cluster velocity
                 j = 0
                 for velocity in self.agents[agent][2]:
@@ -123,6 +123,11 @@ class PSO():
                     j+=1
             print(self.fitness_scores)
             print(self.gbest[0])
+        gbest_clusters = {}
+        for i in range(len(self.gbest[1])):
+            key = "cluster_"+i
+            gbest[key] = self.gbest[1][i]
+        return gbest_clusters
     
 
     def output(self):
