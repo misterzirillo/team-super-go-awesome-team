@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 from sklearn.neighbors import NearestNeighbors
 
 
+# calculates cohesion of the clustered data
+# cluster_dict is {cluster-label: [input vectors]}
+# cluster label 'Noise' is ignored
 def cohesion(cluster_dict):
     # we're not scientists so just return mean cohesion for each cluster
     clust_means = []
@@ -19,11 +22,14 @@ def cohesion(cluster_dict):
                     if p1 is not p2:
                         dists.append(np.linalg.norm(p1 - p2))
 
-            clust_means.append(np.mean(dists))
+            clust_means.append(np.mean(dists) if len(dists) > 0 else 0)
 
-    return np.mean(clust_means)
+    return np.mean(clust_means) if len(clust_means) > 0 else 0
 
 
+# calculates separation of the clustered data
+# cluster_dict is {cluster-label: [input vectors]}
+# cluster label 'Noise' is ignored
 def separation(cluster_dict):
     dists = []
     for key in cluster_dict.keys():
@@ -77,12 +83,12 @@ def readLeafData():
     return read_data('leaf.csv', 2, 16, 0)  # need shape [14 ... 30]
 
 
-def read_some_other_data():
-    pass
+def readSeedsData():
+    return read_data('seeds.csv', 0, 7, 7)
 
 
 def readIrisData():
-    return read_data('iris.data', 0, 5, 5)
+    return read_data('iris.data', 0, 4, 4)
 
 
 def distance(a, b):
