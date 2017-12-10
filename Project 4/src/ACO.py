@@ -7,6 +7,7 @@ from random import randint
 from _overlapped import NULL
 import itertools
 import matplotlib.pyplot as plt
+import operator
 
 class Aco():
     #2D grid, holds tuples (ant at position,item at position)
@@ -47,11 +48,11 @@ class Aco():
         #set initial values for gamma1, gamma2, gamma
         self.max_iter = max_iter
         #scale of dissimilarity, too large mis-clustering, too little small clusters are formed
-        self.gamma =30
+        self.gamma =200
         #pick up constant
-        self.gamma1=.35
+        self.gamma1=1
         #drop constant
-        self.gamma2=.7
+        self.gamma2=2
     
     def place_items(self):
         #place all items randomly on grid
@@ -92,6 +93,8 @@ class Aco():
          
     def optimize(self):
         #plot initial item positions
+        pickups = 0
+        drops =0
         self.plot_items()
         iter=0
         while(True):
@@ -107,65 +110,74 @@ class Aco():
                 curr_item = self.grid[ant_x][ant_y][1]
                 
                 #if the ant is unladen and site is occupied by item y_a
-                if not curr_ant[2] and curr_item is not None:
-                    #print(curr_ant[2])
-                    #compute local density
-                    loc_dens=self.local_density(curr_item,ant_x, ant_y)
-                    #compute pick up rate
-                    pick_up=self.pick_up_rate(curr_item, loc_dens)
-                    r = random.uniform(0,1)
-                    #print(pick_up," ", r)
-                    #if the pick up rate is higher than some random number
-                    if r <= pick_up:
-                        #pick dat shit up
-                        print("Ant ", ant, "picked up item ", curr_item )
-                        #self.colony.update({ant:[ant_x, ant_y, True, curr_item]})
-                        curr_ant[2] = True
-                        curr_ant[3] = curr_item
-                        #print(curr_ant)
-                        self.grid[ant_x][ant_y][1] = None
-                        
-                elif curr_ant[2]:
-                    #print("hey man, dropping this item")  
-                    if curr_item is None:
-                        #if the ant carrying an item and the current site is empty
-                        #print("double check")
+                if iter <= self.max_iter:
+                    if not curr_ant[2] and curr_item is not None:
+                        #print(curr_ant[2])
                         #compute local density
-                        loc_dens=self.local_density(curr_ant[3], ant_x, ant_y)
-                        #compute drop_rate
-                        drop = self.drop_rate(loc_dens)
-                        
+                        loc_dens=self.local_density(curr_item,ant_x, ant_y)
+                        #compute pick up rate
+                        pick_up=self.pick_up_rate(curr_item, loc_dens)
                         r = random.uniform(0,1)
-                        if r <= drop:
-                            #drop dat shit
-                            print("Ant ", ant, "dropped item ", curr_ant[3])
-                            #self.colony.update({ant:[ant_x, ant_y, False,None]})
-                            curr_ant[2] = False
-                            curr_ant[3] = None
-                            self.grid[ant_x][ant_y][1] = curr_item
+                        #print(pick_up," ", r)
+                        #if the pick up rate is higher than some random number
+                        if r <= pick_up:
+                            pickups +=1
+                            #pick dat shit up
+                            #print("Ant ", ant, "picked up item ", curr_item )
+                            #self.colony.update({ant:[ant_x, ant_y, True, curr_item]})
+                            curr_ant[2] = True
+                            curr_ant[3] = curr_item
+                            #print(curr_ant)
+                            self.grid[ant_x][ant_y][1] = None
+                        
+                    elif curr_ant[2]:
+                        #print("hey man, dropping this item")  
+                        if curr_item is None:
+                            #if the ant carrying an item and the current site is empty
+                            #print("double check")
+                            #compute local density
+                            loc_dens=self.local_density(curr_ant[3], ant_x, ant_y)
+                            #compute drop_rate
+                            drop = self.drop_rate(loc_dens)
+                            
+                            r = random.uniform(0,1)
+                            if r <= drop:
+                                drops +=1
+                                #drop dat shit
+                                #print("Ant ", ant, "dropped item ", curr_ant[3], " at ", ant_x, ",",ant_y)
+                                #print(self.grid[ant_x][ant_y])
+                                #self.colony.update({ant:[ant_x, ant_y, False,None]})
+                                curr_ant[2] = False
+                                self.grid[ant_x][ant_y][1] = curr_ant[3]
+                                curr_ant[3] = None
+                                #print("After drop ",self.grid[ant_x][ant_y])
                 
                                       
                 #move ant to a randomly selected neighboring site not occupied by another ant
                 moves = self.get_neighborhood(ant_x, ant_y)
-                if curr_ant[2] ==False:
+                if not curr_ant[2]:
+                    moves_tried =0
                     while True:
-                        moves_tried =0
                         #randomly pick one and move ant to it
                         move = random.choice(moves)
                         move_x = move[0]
                         move_y = move[1]
                         spot = self.grid[move_x][move_y]
-                        if spot[0] == None:
+                        if spot[0] is None:
+                            #print("Ant ", ant, "moved")
                             #self.colony.update({ant:[move[0],move[1],curr_ant[2], curr_ant[3]]})
                             curr_ant[0]=move_x
                             curr_ant[1]=move_y
+                            #print(self.grid[ant_x][ant_y])
                             self.grid[ant_x][ant_y][0]= None
                             self.grid[move_x][move_y][0]=ant
+                            #print(self.grid[ant_x][ant_y])
                             break
                         else:
                             moves_tried +=1
-                            if moves_tried >8:
-                                print("This ant is stuck.  Plz halp")
+                            if moves_tried >16:
+                                print("This ant is stuck.  Plz halp", ant)
+                                break
 #                 else:
 #                     while True:
 #                         moves_tried =0
@@ -180,10 +192,68 @@ class Aco():
 #                         else:
 #                             moves_tried +=1
 #                             if moves_tried >8:
-#                                 print("This ant is stuck.  Plz halp")
+
             iter +=1
-            if iter == self.max_iter:
-                print("Job's done")
+            if iter % 10000 ==0:
+                print("Iteration: ",iter, "Pick ups: ",pickups,"Drops:", drops)
+                self.plot_items()
+            
+            if iter >= self.max_iter:
+                self.finale()
+                print("Job's done. Pick ups: ",pickups, "Drops: ", drops)
+                self.plot_items()
+                break
+#                 else:
+#                     count=0
+#                     for ant, info in self.colony.keys() and self.colony.items():
+#                         if info[2]:
+#                             count+=1
+#                     print("Ants still holding: ",count-1)
+                    
+    def finale(self):
+        count =0
+        while(True):
+            for ant in self.colony:
+                curr_ant = self.colony.get(ant)
+                ant_x = curr_ant[0]
+                ant_y = curr_ant[1]
+                curr_item = self.grid[ant_x][ant_y][1]
+                if curr_ant[2]:
+                    #print("hey man, dropping this item")  
+                    if curr_item is None:
+                        curr_ant[2] = False
+                        self.grid[ant_x][ant_y][1] = curr_ant[3]
+                        curr_ant[3] = None
+
+                #move ant to a randomly selected neighboring site not occupied by another ant
+                moves = self.get_neighborhood(ant_x, ant_y)
+                if not curr_ant[2]:
+                    moves_tried =0
+                    while True:
+                        #randomly pick one and move ant to it
+                        move = random.choice(moves)
+                        move_x = move[0]
+                        move_y = move[1]
+                        spot = self.grid[move_x][move_y]
+                        if spot[0] is None:
+                            #print("Ant ", ant, "moved")
+                            #self.colony.update({ant:[move[0],move[1],curr_ant[2], curr_ant[3]]})
+                            curr_ant[0]=move_x
+                            curr_ant[1]=move_y
+                            #print(self.grid[ant_x][ant_y])
+                            self.grid[ant_x][ant_y][0]= None
+                            self.grid[move_x][move_y][0]=ant
+                            #print(self.grid[ant_x][ant_y])
+                            break
+                        else:
+                            moves_tried +=1
+                            if moves_tried >30:
+                                print("This ant is stuck.  Plz halp", ant)
+                                break
+            count+=1
+            if count %10000 ==0:
+                print("Finale: ", count)
+            if count > 60000:
                 break
             
                 
