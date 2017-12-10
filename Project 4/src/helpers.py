@@ -81,7 +81,7 @@ def read_some_other_data():
     pass
 
 
-def read_iris_data():
+def readIrisData():
     return read_data('iris.data', 0, 5, 5)
 
 
