@@ -6,6 +6,7 @@ import random
 from random import randint
 from _overlapped import NULL
 import itertools
+import matplotlib.pyplot as plt
 
 class Aco():
     #2D grid, holds tuples (ant at position,item at position)
@@ -17,11 +18,13 @@ class Aco():
     data = {}
     max_iter =0
     items = {}
+    classes=[]
     
     
-    def __init__(self, data, num_ants, grid_dim, max_iter):
+    def __init__(self, data, classes, num_ants, grid_dim, max_iter):
         self.data = data
-        
+        self.classes = classes
+            
         #assign integer key to data vector
         for i in range(len(self.data)):
             self.items.update({i:self.data[i]})
@@ -31,13 +34,24 @@ class Aco():
         self.grid_dim = grid_dim
         self.num_ants = num_ants
         self.place_items()
+#         for i in range(len(self.grid)):
+#             for j in range(len(self.grid)):
+#                 item=self.grid[i][j][1]
+#                 print(item)
         self.place_ants()
+#         for i in range(len(self.grid)):
+#             for j in range(len(self.grid)):
+#                 ant=self.grid[i][j][0]
+#                 print(ant)
            
         #set initial values for gamma1, gamma2, gamma
         self.max_iter = max_iter
-        self.gamma =.5
-        self.gamma1=.5
-        self.gamma2=.5
+        #scale of dissimilarity, too large mis-clustering, too little small clusters are formed
+        self.gamma =5
+        #pick up constant
+        self.gamma1=.35
+        #drop constant
+        self.gamma2=.35
     
     def place_items(self):
         #place all items randomly on grid
@@ -45,7 +59,7 @@ class Aco():
             while(True):
                 j = randint(0,self.grid_dim-1)
                 k = randint(0,self.grid_dim-1)
-                if(self.is_empty(j, k)):
+                if(self.is_empty(j, k, 'item')):
                     #print("Placing item ", i, "at position ",j,",",k)
                     self.grid[j][k][1]=i#{ant:(x_pos, y_pos, holding, item)}
                     break
@@ -57,17 +71,23 @@ class Aco():
             while(True):
                 j = randint(0,self.grid_dim-1)
                 k = randint(0,self.grid_dim-1)
-                if(self.is_empty(j, k)):
+                if(self.is_empty(j, k, 'ant')):
                     #print("Placing ant ", i, "at position ",j,",",k)
                     self.colony.update({i:[j,k,False, None]})#{ant:(x_pos, y_pos, holding, item)}
                     break
                 
     #check if a location is unoccupied
-    def is_empty(self, x, y):    
-         if(self.grid[x][y][0]==None and self.grid[x][y][1] == None):
-             return True
-         else:
-             return False
+    def is_empty(self, x, y, type): 
+        if type == 'ant':   
+            if(self.grid[x][y][0]==None):
+                return True
+            else:
+                return False
+        else:
+            if(self.grid[x][y][1]==None):
+                return True
+            else:
+                return False
          
     def optimize(self):
         iter=0
@@ -80,19 +100,21 @@ class Aco():
                 ant_x = curr_ant[0]
                 ant_y = curr_ant[1]
                 curr_item = self.grid[ant_x][ant_y][1]
+                
                 #if the ant is unladen and site is occupied by item y_a
                 if curr_ant[2] == False and curr_item != None:
                     #compute local density
                     loc_dens=self.local_density(curr_item,ant_x, ant_y)
                     #compute pick up rate
-                    pick=self.pick_up_rate(curr_item, loc_dens)
+                    pick_up=self.pick_up_rate(curr_item, loc_dens)
                     r = random.uniform(0,1)
+                    #print(pick_up," ", r)
                     #if the pick up rate is higher than some random number
                     if r <= pick_up:
                         #pick dat shit up
-                        print("Ant ", ant, "picked up item ", curr_item )
+                        #print("Ant ", ant, "picked up item ", curr_item )
                         self.colony.update({ant:(ant_x, ant_y, True, curr_item)})
-                        self.grid[ant_x,ant_y] = None
+                        self.grid[ant_x][ant_y][1] = None
                 else:
                     #if the ant carrying an item and the current site is empty
                     if curr_ant[2] ==True and curr_item == None:
@@ -117,7 +139,7 @@ class Aco():
                     move_x = move[0]
                     move_y = move[1]
                     spot = self.grid[move_x][move_y]
-                    if spot[0] == None and spot[1]==None:
+                    if spot[0] == None:
                         self.colony.update({ant:(move[0],move[1],curr_ant[2], curr_ant[3])})
                         break
                     else:
@@ -136,12 +158,13 @@ class Aco():
         dens = []
         item = self.items[item]
         neighborhood= self.get_neighborhood(x, y)
+        n=1
         for y_b in neighborhood:
             item_b =self.grid[y_b[0]][y_b[1]][1]
-            item_b = self.items[item_b]
             if item_b != None:
-                dens.append((1 - (np.linalg.norm(item- item_b)/gamma)))
-        n = len(neighborhood)
+                item_b = self.items[item_b]
+                dens.append((1 - (np.linalg.norm(item- item_b)/self.gamma)))
+                n +=1
         sim = 1 / n**2 * sum(dens)
         if sim > 0:
             return(sim)
@@ -173,18 +196,48 @@ class Aco():
     #computing the pick up probability 
     #equation 17.46 in engelbrecht 
     def pick_up_rate(self, item, dens):
-        pick_up = (gamma1 / (gamma1 + dens))**2
+        pick_up = (self.gamma1 / (self.gamma1 + dens))**2
         return(pick_up) 
     
     #computing the drop probability
     #equation 17.47 in engelbrecht
     def drop_rate(self, item, dens):
         item = self.items[item]
-        if dens < gamma2:
+        if dens < self.gamma2:
             drop = 2*dens
         else:
             drop = 1
         return drop
+    
+    def plot_items(self):
+        x=[]
+        y=[]
+        z =[]
+        for i in range(len(self.grid)):
+            for j in range(len(self.grid)):
+                x.append(i)
+                y.append(j)
+                item=self.grid[i][j][1]
+                print(item)
+                if item == None:
+                    z.append(0)
+                else:
+                    z.append(self.classes[item])
+                   
+        #build plot of 2D grid
+        zi, yi, xi = np.histogram2d(y, x, bins=(len(self.grid),len(self.grid)), weights=z, normed=False)
+        counts, _, _ = np.histogram2d(y, x, bins=(len(self.grid),len(self.grid)))
+          
+        zi = zi / counts
+        zi = np.ma.masked_invalid(zi) 
+        
+        fig, ax = plt.subplots()
+        ax.pcolormesh(xi, yi, zi, edgecolors='black')    
+        scat = ax.scatter(x, y, c=z, s=3)
+        fig.colorbar(scat)
+        ax.margins(0.05)
+        
+        plt.show()
     
     #build a 2D grid for the ants to traverse
     #access a position self.grid[x][y]

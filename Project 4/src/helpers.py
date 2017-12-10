@@ -61,7 +61,7 @@ def read_data(filename, argStartIndex, argEndIndex, classIndex):
             attrs = tuple(map(float, linearr[argStartIndex: argEndIndex]))
             label = linearr[classIndex]
 
-            outs[attrs] = (label, None)  # label should always be index 0 in tuple, cluster next
+            outs[attrs] = label  # label should always be index 0 in tuple, cluster next
     return outs
 
 
