@@ -75,7 +75,10 @@ class PSO():
         for iter in range(self.max_iter):
             i = -1
             for agent in self.agents:
+                #assign data points to nearest centroid
                 i+=1
+                for x in range(len(self.agents[agent][1])):
+                    self.agents[agent][1][x] = []
                 for data_key in self.data.keys():
                     distances = []
                     for centroid in self.agents[agent][0]:
@@ -85,30 +88,40 @@ class PSO():
                 #calculate fitness
                 fitness = 0
                 j = -1
+                sum = 0
                 for centroid in self.agents[agent][0]:
                     j+=1
-                    size = len(centroid)
-                    sum = 0
-                    for data_vector in  self.agents[agent][1][j]:
-                        sum += (data_vector[1]/size)
+                    size = len(self.agents[agent][1][j])
+                    for data_vector in self.agents[agent][1][j]:
+                        sum += data_vector[1]/size #((np.linalg.norm(np.array(list(data_vector)) - np.array(centroid)))/size)
+                if sum == 0:
+                    print(sum)
                 fitness = sum / len(self.agents[agent][0])
+                if fitness == 0:
+                    print("0 fitness")
+                    #print(self.agents[agent][1])
                 self.fitness_scores[i] = fitness
                 if fitness < self.lbests[i][0]:
+                    print('new lbest')
                     self.lbests[i] = [fitness, self.agents[agent][0]]
                     if fitness < self.gbest[0]:
+                        print('new gbest')
                         self.gbest = [fitness, self.agents[agent][0]]
                 #update cluster velocity
                 j = 0
                 for velocity in self.agents[agent][2]:
-                    velocity = self.inertia*velocity + ((self.c1*random.uniform(0,1))*x for x in (np.array(self.lbests[0][1][j])-np.array(self.agents[agent][0][j])))+((self.c2*random.uniform(0,1))*x for x in (np.array(self.gbest[1][j])-np.array(self.agents[agent][0][j])))
+                    for x in range(len(velocity)):
+                       self.agents[agent][2][j][x] += self.inertia * velocity[x]
+                       self.agents[agent][2][j][x] += self.c1*random.uniform(0,1)*(self.lbests[0][1][j][x] - self.agents[agent][0][j][x])
+                       self.agents[agent][2][j][x] += self.c2*random.uniform(0,1)*(self.gbest[1][j][x] - self.agents[agent][0][j][x])
                     j += 1
                 #update cluster position    
                 j=0
                 for centroid in self.agents[agent][0]:
-                    centroid = centroid + self.agents[agent][1][j]
+                    for x in range(len(centroid)):
+                        self.agents[agent][0][j][x] += self.agents[agent][2][j][x]
                     j+=1
-            for i in self.lbests:
-                print(i[0])
+            print(self.fitness_scores)
             print(self.gbest[0])
     
 
