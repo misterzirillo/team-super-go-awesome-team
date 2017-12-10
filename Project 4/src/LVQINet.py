@@ -22,11 +22,7 @@ class LVQI:
             enumerate(self.weights),
             key=lambda tup: helpers.distance(input_pattern, tup[1]) - (guilt_factor(tup[0]) if guilt_factor else 0))
 
-    def output(self, training_data, max_epochs=1000, min_error=.1):
-
-        # we dont want to mutate the original dictionary (may screw with other methods if dict is reused)
-        # so copy it and return the copy after all is done
-        new_clusters = training_data.copy()
+    def output(self, training_data, max_epochs=100, min_error=.1):
 
         # expecting training_data as a dictionary so need to extract keys
         np_data = helpers.get_input_matrix_from_dict(training_data)
@@ -34,12 +30,17 @@ class LVQI:
         # do clustering
         self.train(np_data, max_epochs, min_error)
 
-        # change the dict value for each thing
+        # put to cluster_dict
+        cluster_dict = {}
         for pattern in np_data:
-            key = tuple(pattern)
-            new_clusters[key] = (new_clusters[key][0], self.propagate(pattern))
+            cluster = self.propagate(pattern)[0]
 
-        return new_clusters
+            if cluster in cluster_dict:
+                cluster_dict[cluster].append(pattern)
+            else:
+                cluster_dict[cluster] = [pattern]
+
+        return cluster_dict
 
     # take some iterable input numpys
     # and learn the clusters
@@ -97,4 +98,4 @@ class LVQI:
             print(quantization_error)
             keep_going = quantization_error > min_error and epoch < max_epochs
 
-        print('LVQI finished at epoch ' + str(epoch) + ' error ' + str(quantization_error))
+        print('LVQI finished at epoch ' + str(epoch) + ' quantization error ' + str(quantization_error))

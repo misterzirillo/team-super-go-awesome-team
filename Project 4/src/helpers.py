@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 from sklearn.neighbors import NearestNeighbors
 
 
+# calculates cohesion of the clustered data
+# cluster_dict is {cluster-label: [input vectors]}
+# cluster label 'Noise' is ignored
 def cohesion(cluster_dict):
     # we're not scientists so just return mean cohesion for each cluster
     clust_means = []
@@ -24,6 +27,9 @@ def cohesion(cluster_dict):
     return np.mean(clust_means)
 
 
+# calculates separation of the clustered data
+# cluster_dict is {cluster-label: [input vectors]}
+# cluster label 'Noise' is ignored
 def separation(cluster_dict):
     dists = []
     for key in cluster_dict.keys():
