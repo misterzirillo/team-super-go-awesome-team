@@ -3,14 +3,38 @@
 import numpy as np
 import random
 import re
+import matplotlib.pyplot as plt
+from sklearn.neighbors import NearestNeighbors
 
 
-def fmeasure():
-    pass
+def cohesion(cluster_dict):
+    # we're not scientists so just return mean cohesion for each cluster
+    clust_means = []
+    for k, v in cluster_dict.items():
+        if k is not 'Noise':
+            points = v
+            dists = []
+            for p1 in points:
+                for p2 in points:
+                    if p1 is not p2:
+                        dists.append(np.linalg.norm(p1 - p2))
+
+            clust_means.append(np.mean(dists))
+
+    return np.mean(clust_means)
 
 
-def norm_mutual_info():
-    pass
+def separation(cluster_dict):
+    dists = []
+    for key in cluster_dict.keys():
+        if key is not 'Noise':
+            mean_point = np.mean(cluster_dict[key], axis=0)
+            for key2 in cluster_dict.keys():
+                if key2 is not 'Noise' and key is not key2:
+                    mean_point2 = np.mean(cluster_dict[key2], axis=0)
+                    dists.append(distance(mean_point, mean_point2))
+
+    return np.mean(dists) if len(dists) > 0 else 0
 
 
 def report():
@@ -53,6 +77,14 @@ def readLeafData():
     return read_data('leaf.csv', 2, 16, 0)  # need shape [14 ... 30]
 
 
+def read_some_other_data():
+    pass
+
+
+def read_iris_data():
+    return read_data('iris.data', 0, 5, 5)
+
+
 def distance(a, b):
     return np.linalg.norm(a - b)
 
@@ -72,4 +104,17 @@ def float_to_str(lst):
     for i in lst:
         x += (repr(i))
     return x
+
+#using knn to educate the tuning process for min_pts and eps in DBSCAN
+#para x is the result of get_input_matrix_from_dict()
+def knn_plot(x):
+    means =[]
+    #for all possible k, run knn
+    for i in range(1,len(x)):
+        neigh = NearestNeighbors(n_neighbors=i).fit(x)
+        distances, indices = neigh.kneighbors(x)
+        means.append(distances.mean())
+    #plot the mean distance between points at each k value  
+    plt.plot(means)
+    plt.show()
     
