@@ -88,7 +88,7 @@ def readSeedsData():
 
 
 def readIrisData():
-    return read_data('iris.data', 0, 5, 5)
+    return read_data('iris.data', 0, 4, 4)
 
 
 def distance(a, b):
