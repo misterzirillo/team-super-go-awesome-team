@@ -125,8 +125,8 @@ class PSO():
             print(self.gbest[0])
         gbest_clusters = {}
         for i in range(len(self.gbest[1])):
-            key = "cluster_"+i
-            gbest[key] = self.gbest[1][i]
+            key = "cluster_"+str(i)
+            gbest_clusters[key] = self.gbest[1][i]
         return gbest_clusters
     
 
