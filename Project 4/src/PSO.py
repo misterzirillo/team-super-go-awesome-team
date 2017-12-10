@@ -124,9 +124,9 @@ class PSO():
             print(self.fitness_scores)
             print(self.gbest[0])
         gbest_clusters = {}
-        for i in range(len(self.gbest[1])):
+        for i in range(len(self.gbest[2])):
             key = "cluster_"+str(i)
-            gbest_clusters[key] = self.gbest[1][i]
+            gbest_clusters[key] = self.gbest[2][i]
         return gbest_clusters
     
 

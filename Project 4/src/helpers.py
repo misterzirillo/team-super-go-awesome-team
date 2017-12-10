@@ -77,8 +77,8 @@ def readLeafData():
     return read_data('leaf.csv', 2, 16, 0)  # need shape [14 ... 30]
 
 
-def read_some_other_data():
-    pass
+def readSeedsData():
+    return read_data('seeds.csv', 0, 7, 7)
 
 
 def read_iris_data():
