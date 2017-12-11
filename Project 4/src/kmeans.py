@@ -32,8 +32,7 @@ class kmeans():
         for i in range(len(K)):
             self.keys.update({i: K[i]})
             
-
-
+    # find clusters
     def optimize(self):
         iter = 0
         #until the centroids stop changing
