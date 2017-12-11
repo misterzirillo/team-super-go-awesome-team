@@ -209,7 +209,7 @@ class Aco():
 #                             count+=1
 #                     print("Ants still holding: ",count-1)
 
-                    
+    # when iterations have finished force ants to drop their items
     def finale(self):
         count =0
         while(True):
@@ -313,7 +313,8 @@ class Aco():
             drop = 1
         #print(drop)
         return(drop)
-    
+
+    # create the ant-plot
     def plot_items(self):
         x=[]
         y=[]

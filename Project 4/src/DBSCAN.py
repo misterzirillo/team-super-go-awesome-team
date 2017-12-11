@@ -77,7 +77,8 @@ class DBSCAN():
             map(
                 operator.itemgetter(0),
                 filter(lambda x: x[0] is not p and np.linalg.norm(x[1] - self.keys[p]) <= self.eps, self.keys.items())))
-    
+
+    # output the cluster dictionary
     def output(self):
         cluster_dict = {}
         for label in set(self.labels.values()):

@@ -43,14 +43,6 @@ def separation(cluster_dict):
 
     return np.mean(dists) if len(dists) > 0 else None
 
-
-def report():
-    pass
-
-
-def crossVal():
-    pass
-
 # parse in a dataset from the data folder by name
 # argStart index is where to start slicing a line to capture all args
 # argEnd index is were to stop slicing args
