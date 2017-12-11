@@ -48,11 +48,11 @@ class Aco():
         #set initial values for gamma1, gamma2, gamma
         self.max_iter = max_iter
         #scale of dissimilarity, too large mis-clustering, too little small clusters are formed
-        self.gamma =200
+        self.gamma =2000
         #pick up constant
-        self.gamma1=1
+        self.gamma1=1000
         #drop constant
-        self.gamma2=2
+        self.gamma2=100
     
     def place_items(self):
         #place all items randomly on grid

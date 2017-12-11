@@ -15,7 +15,7 @@ class kmeans():
     actuals=[]
     
     #dictionary the holds the actual data vectors of the centroids
-    keys ={}
+    keys = {}
     
     #big C holds all c clusters, dictionary of lists. keys are the centroids, values are the points in the cluster
     C = {}
