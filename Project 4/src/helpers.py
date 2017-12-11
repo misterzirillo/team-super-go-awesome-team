@@ -14,7 +14,7 @@ def cohesion(cluster_dict):
     # we're not scientists so just return mean cohesion for each cluster
     clust_means = []
     for k, v in cluster_dict.items():
-        if k is not 'Noise':
+        if k != 'Noise':
             points = v
             dists = []
             for p1 in points:
@@ -22,9 +22,10 @@ def cohesion(cluster_dict):
                     if p1 is not p2:
                         dists.append(np.linalg.norm(p1 - p2))
 
-            clust_means.append(np.mean(dists) if len(dists) > 0 else 0)
+            if len(dists) > 0:
+                clust_means.append(np.mean(dists))
 
-    return np.mean(clust_means) if len(clust_means) > 0 else 0
+    return np.mean(clust_means) if len(clust_means) > 0 else None
 
 
 # calculates separation of the clustered data
@@ -40,7 +41,7 @@ def separation(cluster_dict):
                     mean_point2 = np.mean(cluster_dict[key2], axis=0)
                     dists.append(distance(mean_point, mean_point2))
 
-    return np.mean(dists) if len(dists) > 0 else 0
+    return np.mean(dists) if len(dists) > 0 else None
 
 
 def report():
