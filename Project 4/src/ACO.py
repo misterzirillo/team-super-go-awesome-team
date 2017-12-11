@@ -48,11 +48,11 @@ class Aco():
         #set initial values for gamma1, gamma2, gamma
         self.max_iter = max_iter
         #scale of dissimilarity, too large mis-clustering, too little small clusters are formed
-        self.gamma =2000
+        self.gamma =100
         #pick up constant
-        self.gamma1=1000
+        self.gamma1=.6
         #drop constant
-        self.gamma2=100
+        self.gamma2=.35
     
     def place_items(self):
         #place all items randomly on grid
@@ -155,29 +155,28 @@ class Aco():
                                       
                 #move ant to a randomly selected neighboring site not occupied by another ant
                 moves = self.get_neighborhood(ant_x, ant_y)
-                if not curr_ant[2]:
-                    moves_tried =0
-                    while True:
-                        #randomly pick one and move ant to it
-                        move = random.choice(moves)
-                        move_x = move[0]
-                        move_y = move[1]
-                        spot = self.grid[move_x][move_y]
-                        if spot[0] is None:
-                            #print("Ant ", ant, "moved")
-                            #self.colony.update({ant:[move[0],move[1],curr_ant[2], curr_ant[3]]})
-                            curr_ant[0]=move_x
-                            curr_ant[1]=move_y
-                            #print(self.grid[ant_x][ant_y])
-                            self.grid[ant_x][ant_y][0]= None
-                            self.grid[move_x][move_y][0]=ant
-                            #print(self.grid[ant_x][ant_y])
+                moves_tried =0
+                while True:
+                    #randomly pick one and move ant to it
+                    move = random.choice(moves)
+                    move_x = move[0]
+                    move_y = move[1]
+                    spot = self.grid[move_x][move_y]
+                    if spot[0] is None:
+                        #print("Ant ", ant, "moved")
+                        #self.colony.update({ant:[move[0],move[1],curr_ant[2], curr_ant[3]]})
+                        curr_ant[0]=move_x
+                        curr_ant[1]=move_y
+                        #print(self.grid[ant_x][ant_y])
+                        self.grid[ant_x][ant_y][0]= None
+                        self.grid[move_x][move_y][0]=ant
+                        #print(self.grid[ant_x][ant_y])
+                        break
+                    else:
+                        moves_tried +=1
+                        if moves_tried >16:
+                            print("This ant is stuck.  Plz halp", ant)
                             break
-                        else:
-                            moves_tried +=1
-                            if moves_tried >16:
-                                print("This ant is stuck.  Plz halp", ant)
-                                break
 #                 else:
 #                     while True:
 #                         moves_tried =0
@@ -209,6 +208,7 @@ class Aco():
 #                         if info[2]:
 #                             count+=1
 #                     print("Ants still holding: ",count-1)
+
                     
     def finale(self):
         count =0
@@ -227,33 +227,32 @@ class Aco():
 
                 #move ant to a randomly selected neighboring site not occupied by another ant
                 moves = self.get_neighborhood(ant_x, ant_y)
-                if not curr_ant[2]:
-                    moves_tried =0
-                    while True:
-                        #randomly pick one and move ant to it
-                        move = random.choice(moves)
-                        move_x = move[0]
-                        move_y = move[1]
-                        spot = self.grid[move_x][move_y]
-                        if spot[0] is None:
-                            #print("Ant ", ant, "moved")
-                            #self.colony.update({ant:[move[0],move[1],curr_ant[2], curr_ant[3]]})
-                            curr_ant[0]=move_x
-                            curr_ant[1]=move_y
-                            #print(self.grid[ant_x][ant_y])
-                            self.grid[ant_x][ant_y][0]= None
-                            self.grid[move_x][move_y][0]=ant
-                            #print(self.grid[ant_x][ant_y])
+                moves_tried =0
+                while True:
+                    #randomly pick one and move ant to it
+                    move = random.choice(moves)
+                    move_x = move[0]
+                    move_y = move[1]
+                    spot = self.grid[move_x][move_y]
+                    if spot[0] is None:
+                        #print("Ant ", ant, "moved")
+                        #self.colony.update({ant:[move[0],move[1],curr_ant[2], curr_ant[3]]})
+                        curr_ant[0]=move_x
+                        curr_ant[1]=move_y
+                        #print(self.grid[ant_x][ant_y])
+                        self.grid[ant_x][ant_y][0]= None
+                        self.grid[move_x][move_y][0]=ant
+                        #print(self.grid[ant_x][ant_y])
+                        break
+                    else:
+                        moves_tried +=1
+                        if moves_tried >16:
+                            print("This ant is stuck.  Plz halp", ant)
                             break
-                        else:
-                            moves_tried +=1
-                            if moves_tried >30:
-                                print("This ant is stuck.  Plz halp", ant)
-                                break
             count+=1
-            if count %10000 ==0:
+            if count %1000 ==0:
                 print("Finale: ", count)
-            if count > 60000:
+            if count > 3000:
                 break
             
                 
