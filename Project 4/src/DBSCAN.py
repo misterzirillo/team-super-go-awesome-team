@@ -42,7 +42,7 @@ class DBSCAN():
                 self.labels.update({p: 'Noise'})
                 continue
             
-            C =+1
+            C += 1
             #give p label
             # print("Point added to cluster ,",C)
             self.labels.update({p: C})
@@ -61,7 +61,7 @@ class DBSCAN():
                         # print("Previously labeled ,", self.labels.get(Q))
                         continue
                     else:
-                        print("Is now member of cluster ", C)
+                        # print("Is now member of cluster ", C)
                         self.labels.update({Q: C})
                         neighbors = self.range_query(Q)
                         #density check
@@ -76,7 +76,7 @@ class DBSCAN():
         return list(
             map(
                 operator.itemgetter(0),
-                filter(lambda x: x[0] is not p and np.linalg.norm(x[1] - p) <= self.eps, self.keys.items())))
+                filter(lambda x: x[0] is not p and np.linalg.norm(x[1] - self.keys[p]) <= self.eps, self.keys.items())))
     
     def output(self):
         cluster_dict = {}
