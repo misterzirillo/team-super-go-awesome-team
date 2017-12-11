@@ -1,6 +1,4 @@
-'''
-Learning Vector Quantization
-'''
+# Learning vector quantization
 
 import numpy as np
 import helpers
@@ -8,6 +6,9 @@ import helpers
 
 class LVQI:
 
+    # eta = learning rate
+    # beta = conscience parameter
+    # gamma = conscience parameter
     def __init__(self, num_attrs, num_clusters, eta, beta, gamma):
         self.num_attrs, self.num_clusters = (num_attrs, num_clusters)
         self.eta = eta
@@ -60,12 +61,8 @@ class LVQI:
                 guilt[i] = new_guilt
                 return self.gamma * (1 / self.num_attrs - new_guilt)
 
-        # get max/min for each attr
-        maxes = np.nanmax(training_data, axis=0)
-        mins = np.nanmin(training_data, axis=0)
-
-        # initialize weights to random values inside the training data space
-        self.weights = list(np.random.rand(self.num_clusters, self.num_attrs) * (maxes - mins) + mins)
+        # initialize weights to random inputs
+        self.weights = training_data[np.random.choice(training_data.shape[0], self.num_clusters, replace=False)]
 
         epoch = 0
         keep_going = True
@@ -91,11 +88,9 @@ class LVQI:
 
                 # some record-keeping
                 error_sum += np.sqrt(winner_delta.dot(winner_delta)) ** 2
-                # print('Winning cluster ' + str(winner_index) + ' updated by ' + str(np.linalg.norm(winner_delta)))
-                # print('Guilt ' + str(np.array(guilt)))
 
             quantization_error = error_sum / len(training_data)
-            print(quantization_error)
+            # print(quantization_error) # uncomment for runtime printing
             keep_going = quantization_error > min_error and epoch < max_epochs
 
         print('LVQI finished at epoch ' + str(epoch) + ' quantization error ' + str(quantization_error))

@@ -65,7 +65,7 @@ def read_data(filename, argStartIndex, argEndIndex, classIndex):
         for line in f:
             linearr = line.split(',')
             attrs = tuple(map(float, linearr[argStartIndex: argEndIndex]))
-            label = linearr[classIndex]
+            label = linearr[classIndex].strip()
 
             outs[attrs] = label  # label should always be index 0 in tuple, cluster next
     return outs
